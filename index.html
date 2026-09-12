@@ -290,7 +290,7 @@ button, select { font: inherit; }
     <section id="view-start">
       <div class="panel start-panel">
         <h2>New Game</h2>
-        <p class="hint">Tap a slot, hit SPIN, tap a player to inspect, then Draft. First spin per slot is free.</p>
+        <p class="hint">Tap a slot, hit SPIN, tap a player to inspect, then Draft. First spin per slot is free. Respins reset to 4 after each draft.</p>
         <label class="toggle-row" for="infiniteRespins">
           <span>
             <strong>Infinite respins</strong>
@@ -1335,6 +1335,8 @@ button, select { font: inherit; }
     state.choicesForSlot = null;
     state.selectedSlot = null;
     state.slotHasReveal = false;
+    // Fresh 4 respins for the next roster spot (unless infinite mode)
+    if (!state.infiniteRespins) state.respinsLeft = DEFAULT_RESPINS;
     if (rosterFull()) {
       updateTabs();
       el("buildComplete").classList.remove("hidden");
