@@ -131,7 +131,8 @@ POS_HEAD = {
     "running back": "RB", "running backs": "RB", "halfback": "RB", "halfbacks": "RB",
     "fullback": "RB", "fullbacks": "RB", "tailback": "RB",
     "wide receiver": "WR", "wide receivers": "WR", "flanker": "WR", "flankers": "WR",
-    "split end": "WR", "end": "WR", "ends": "WR",
+    "split end": "WR", "split ends": "WR",
+    # Bare "end(s)" is ambiguous (SE vs TE historically) — skip; use tight end / WR labels.
     "tight end": "TE", "tight ends": "TE",
     "tackle": "OT", "tackles": "OT", "offensive tackle": "OT", "offensive tackles": "OT",
     "guard": "OG", "guards": "OG", "offensive guard": "OG", "offensive guards": "OG",
@@ -167,15 +168,17 @@ SLOT_GROUP = {
     "K": ["K"], "P": ["P"], "RET": ["RET"],
 }
 
+# OL/DL/LB/DB may widen within trench/secondary. Skill groups (QB/RB/WR/TE/K/P) never widen.
 WIDEN = {
     "OT": ["OG", "C"], "OG": ["OT", "C"], "C": ["OG", "OT"],
     "DE": ["OLB", "DT"], "DT": ["DE"],
     "OLB": ["DE", "LB", "MLB"], "MLB": ["LB", "OLB"], "LB": ["OLB", "MLB"],
     "CB": ["S", "FS", "SS"], "S": ["CB", "FS", "SS"], "SS": ["S", "FS", "CB"], "FS": ["S", "SS", "CB"],
-    "WR": ["TE"], "TE": ["WR"], "RB": ["RET"],
-    "K": ["P"], "P": ["K"],
+    # RET may borrow return-capable skill/DB bodies; do not widen WR/TE/QB/RB/K/P into each other.
     "RET": ["WR", "RB", "CB"],
 }
+
+SKILL_NO_WIDEN = {"QB", "RB", "WR", "TE", "K", "P"}
 
 NFLVERSE_POS = {
     "QB": "QB",
@@ -294,9 +297,13 @@ def map_nflverse_team(code: str, year: int) -> str | None:
 def map_pos_label(label: str) -> str | None:
     lab = re.sub(r"\s+", " ", (label or "").strip().lower())
     lab = lab.replace("(s)", "").replace("offence", "offense")
+    # Ambiguous historical "End(s)" — do not guess WR vs TE.
+    if lab in ("end", "ends"):
+        return None
     if lab in POS_HEAD:
         return POS_HEAD[lab]
-    for key, val in POS_HEAD.items():
+    # Prefer longer keys first so "tight end" / "defensive end" beat shorter stems.
+    for key, val in sorted(POS_HEAD.items(), key=lambda kv: -len(kv[0])):
         if lab.startswith(key):
             return val
     return None
@@ -402,6 +409,10 @@ def parse_allpro(path: Path, year: int) -> list[dict]:
             continue
         head = re.sub(r"\[edit\]", "", line).strip().rstrip(":")
         mapped = map_pos_label(head)
+        # Ambiguous historical "Ends" mixed SE and TE — skip the section.
+        if head.lower() in ("end", "ends") and len(head.split()) <= 4:
+            pos = None
+            continue
         if mapped and len(head.split()) <= 4:
             pos = mapped
             continue
@@ -417,6 +428,8 @@ def parse_probowl(path: Path, year: int) -> list[dict]:
     if not path.exists() or path.stat().st_size < 2000:
         return []
     text = html_to_text(path.read_text(errors="ignore"))
+    # Flatten newlines so "Tight end\n82 Name, Team" still matches.
+    text = re.sub(r"\s+", " ", text)
     recs = []
     # Rows often: "Quarterback 14 Ken Stabler, Oakland 12 Bob Griese, Miami"
     pos_pat = (
@@ -425,7 +438,7 @@ def parse_probowl(path: Path, year: int) -> list[dict]:
         r"Linebackers?|Cornerbacks?|Safeties?|Kickers?|Punters?|Returners?|"
         r"Kick returners?|Punt returners?|Special teams)"
     )
-    for m in re.finditer(pos_pat + r"(.{8,400})", text, re.I):
+    for m in re.finditer(pos_pat + r"(.{8,800}?)" + r"(?=(?:" + pos_pat + r")|$)", text, re.I):
         pos = map_pos_label(m.group(1))
         if not pos:
             continue
@@ -470,7 +483,11 @@ def parse_alldecade(path: Path, decade: str) -> list[dict]:
     pos = None
     for raw_line in text.splitlines():
         line = raw_line.strip()
-        mapped = map_pos_label(re.sub(r"\[edit\]", "", line).strip().rstrip(":"))
+        head = re.sub(r"\[edit\]", "", line).strip().rstrip(":")
+        mapped = map_pos_label(head)
+        if head.lower() in ("end", "ends") and len(head.split()) <= 5:
+            pos = None
+            continue
         if mapped and len(line.split()) <= 5:
             pos = mapped
             continue
@@ -828,6 +845,53 @@ def better(a: dict, b: dict) -> dict:
     return out
 
 
+def collapse_wr_te_conflicts(recs: list[dict]) -> list[dict]:
+    """If the same player-team-year is tagged both WR and TE, keep one.
+
+    Prefer curated/nflverse position, then TE when the other is honor-only WR,
+    then the higher-rated / richer-stat row.
+    """
+    by = defaultdict(list)
+    for r in recs:
+        if r.get("pos") in ("WR", "TE"):
+            nk = ALIASES.get(name_key(r["name"]), name_key(r["name"]))
+            by[(nk, r["team"], r["year"])].append(r)
+        else:
+            by[("_other", id(r))].append(r)
+
+    out = []
+    seen_other = set()
+    for key, rows in by.items():
+        if key[0] == "_other":
+            out.extend(rows)
+            continue
+        wrs = [r for r in rows if r["pos"] == "WR"]
+        tes = [r for r in rows if r["pos"] == "TE"]
+        if wrs and tes:
+            def rank(r):
+                src = {"curated": 3, "nflverse": 2, "roster": 2, "allpro": 1, "probowl": 1, "all-decade": 1}.get(r.get("source"), 0)
+                rich = sum(ch.isdigit() for ch in (r.get("stats") or ""))
+                return (src, r.get("rating", 0), rich)
+            best_te = max(tes, key=rank)
+            best_wr = max(wrs, key=rank)
+            # Prefer curated/nflverse winner; tie-break toward TE when wiki honor-only WR.
+            if rank(best_te) >= rank(best_wr):
+                keep_pos = "TE"
+            elif best_wr.get("source") in ("curated", "nflverse", "roster"):
+                keep_pos = "WR"
+            else:
+                keep_pos = "TE"
+            chosen = [r for r in rows if r["pos"] == keep_pos]
+            # merge best of discarded pos honors into keeper via better()
+            keep = chosen[0]
+            for r in chosen[1:]:
+                keep = better(keep, r)
+            out.append(keep)
+        else:
+            out.extend(rows)
+    return out
+
+
 def merge_records(groups: list[list[dict]]) -> list[dict]:
     idx = {}
     order = []
@@ -890,40 +954,50 @@ def collect_for(all_by: dict, team: str, dec: str, groups: list[str]) -> list[di
     return out
 
 
+def first_decade_for(team: str) -> str | None:
+    """Earliest dial decade with any real franchise seasons."""
+    for dec in DECADES:
+        if franchise_years(team, dec):
+            return dec
+    return None
+
+
 def fill_key(all_by: dict, team: str, dec: str, slot: str) -> list[dict]:
+    """Fill a roster key with same-position players whose season year is IN `dec`.
+
+    - Never widen WR/TE/QB/RB/K/P across skill groups.
+    - Never pull neighbor-decade seasons into this decade's keys.
+    - Pre-founding decades: borrow from the franchise's first real decade only
+      (cards keep their real season years).
+    """
     groups = SLOT_GROUP[slot]
+    years = franchise_years(team, dec)
+
+    # Expansion / pre-founding: use first decade the franchise existed.
+    if not years:
+        first = first_decade_for(team)
+        if not first or first == dec:
+            return []
+        return fill_key(all_by, team, first, slot)
+
     cands = collect_for(all_by, team, dec, groups)
     picked = pick_top(cands, 3)
     if len(picked) >= 3:
         return picked
 
-    # widen position within same team-decade
-    extra_groups = []
-    for g in groups:
-        extra_groups.extend(WIDEN.get(g, []))
-    extra_groups = [g for g in extra_groups if g not in groups]
-    if extra_groups:
-        cands = collect_for(all_by, team, dec, groups + extra_groups)
-        picked = pick_top(cands, 3)
-        if len(picked) >= 3:
-            return picked
+    # Widen only within OL/DL/LB/DB (and RET sources) — same decade only.
+    primary = groups[0]
+    extra_groups: list[str] = []
+    if primary not in SKILL_NO_WIDEN:
+        for g in groups:
+            extra_groups.extend(WIDEN.get(g, []))
+        extra_groups = [g for g in extra_groups if g not in groups]
+        if extra_groups:
+            cands = collect_for(all_by, team, dec, groups + extra_groups)
+            picked = pick_top(cands, 3)
 
-    # nearest decades, same franchise + position (real seasons, real years)
-    dec_i = DECADES.index(dec)
-    for dist in range(1, 7):
-        neighbors = []
-        if dec_i - dist >= 0:
-            neighbors.append(DECADES[dec_i - dist])
-        if dec_i + dist < len(DECADES):
-            neighbors.append(DECADES[dec_i + dist])
-        more = list(cands)
-        for nd in neighbors:
-            more.extend(collect_for(all_by, team, nd, groups + extra_groups))
-        picked = pick_top(more, 3)
-        if len(picked) >= 3:
-            return picked
-
-    return pick_top(cands, 3)
+    # Prefer 1–2 real in-decade same-position players over wrong-pos / wrong-era fill.
+    return pick_top(cands if cands else [], 3)
 
 
 def to_card(rec: dict) -> dict:
@@ -966,6 +1040,7 @@ def main():
     print(" nflverse/roster", len(modern))
 
     merged = merge_records([curated, wiki, modern, legacy])
+    merged = collapse_wr_te_conflicts(merged)
     print(" merged unique player-seasons", len(merged))
 
     all_by = defaultdict(list)
@@ -981,12 +1056,8 @@ def main():
                 key = f"{team}|{dec}|{slot}"
                 if len(picked) < 3:
                     holes.append((key, [p["name"] for p in picked]))
-                    # last-ditch: any real player from this franchise
-                    pool = []
-                    for (t, y, g), rows in all_by.items():
-                        if t == team:
-                            pool.extend(rows)
-                    picked = pick_top(picked + pool, 3)
+                # Keep only real in-decade (or first-decade for pre-founding) cards —
+                # never pad with wrong position or wrong-era seasons.
                 roster[key] = [to_card(p) for p in picked[:3]]
 
     print("keys", len(roster), "expected", 32 * 7 * 25)
