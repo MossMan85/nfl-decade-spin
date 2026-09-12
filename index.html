@@ -37,21 +37,15 @@ button, select { font: inherit; }
 .wrap { max-width: 980px; margin: 0 auto; }
 .hero {
   background: linear-gradient(135deg, #1b2b4d, #24183a 60%, #1a3a32);
-  border: 1px solid var(--line); border-radius: 20px; padding: 18px 18px 14px;
-  box-shadow: var(--shadow); margin-bottom: 14px; position: relative; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 20px; padding: 14px 16px 12px;
+  box-shadow: var(--shadow); margin-bottom: 12px; position: relative; overflow: hidden;
 }
-.hero::after {
-  content:""; position:absolute; inset:auto -20% -40% auto; width:220px; height:220px;
-  background: radial-gradient(circle, rgba(245,197,66,.25), transparent 70%);
-  pointer-events:none;
-}
-.hero h1 { font-size: clamp(1.4rem, 4vw, 2rem); }
-.hero p { color: var(--muted); margin: 0; font-size: .95rem; line-height: 1.4; }
-.tabs {
-  display: flex; gap: 8px; margin: 14px 0; flex-wrap: wrap;
-}
+.hero.compact { padding: 12px 14px; }
+.hero h1 { font-size: clamp(1.25rem, 3.5vw, 1.75rem); margin-bottom: .2em; }
+.hero-sub, .hero p { color: var(--muted); margin: 0; font-size: .88rem; line-height: 1.35; }
+.tabs { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
 .tab {
-  flex: 1; min-width: 100px; padding: 12px 10px; border-radius: 999px;
+  flex: 1; min-width: 90px; padding: 10px 8px; border-radius: 999px;
   border: 1px solid var(--line); background: var(--panel); color: var(--muted);
   font-weight: 700; cursor: pointer; transition: .15s ease;
 }
@@ -59,75 +53,147 @@ button, select { font: inherit; }
 .tab:disabled { opacity: .4; cursor: not-allowed; }
 .panel {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 14px; box-shadow: var(--shadow); margin-bottom: 14px;
+  padding: 12px; box-shadow: var(--shadow); margin-bottom: 12px;
 }
-.panel h2 { font-size: 1.15rem; display:flex; align-items:center; gap:8px; }
+.panel h2 { font-size: 1.05rem; display:flex; align-items:center; gap:8px; }
+.panel-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px; }
+.panel-head h2 { margin:0; }
+.start-panel { max-width: 520px; margin: 0 auto 14px; }
+.toggle-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background: var(--panel2); border:1px solid var(--line); border-radius: 12px; padding: 12px;
+  cursor: pointer;
+}
+.toggle-row input { width: 22px; height: 22px; accent-color: var(--gold); }
 .badge {
-  display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px;
-  font-size:.75rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+  display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:999px;
+  font-size:.7rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
 }
 .badge.legend { background: rgba(245,197,66,.18); color: var(--legend); border:1px solid rgba(245,197,66,.4); }
 .badge.star { background: rgba(77,163,255,.15); color: var(--star); border:1px solid rgba(77,163,255,.4); }
 .badge.starter { background: rgba(139,155,184,.12); color: var(--starter); border:1px solid rgba(139,155,184,.35); }
+.build-top { display:flex; gap:8px; flex-wrap:wrap; align-items:stretch; margin-bottom: 8px; }
 .slot-banner {
   background: linear-gradient(90deg, #223456, #2a1f3f); border:1px dashed #3d527a;
-  border-radius: 12px; padding: 12px 14px; margin-bottom: 12px;
+  border-radius: 12px; padding: 10px 12px; flex:1; min-width: 200px;
 }
-.slot-banner strong { color: var(--gold); font-size: 1.2rem; }
-.dials {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+.slot-banner.compact { padding: 8px 10px; }
+.slot-banner strong { color: var(--gold); }
+.respin-meter { display:flex; align-items:center; }
+.respin-pill {
+  background: #101a2c; border:1px solid var(--line); border-radius:999px;
+  padding: 8px 14px; font-weight:700; white-space:nowrap; font-size:.9rem;
 }
+.respin-pill strong { color: var(--gold); font-size:1.1rem; }
+.respin-pill.empty { border-color: var(--red); color: var(--red); }
+.respin-pill.infinite { border-color: var(--green); color: var(--green); }
+.dials { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.compact-dials .dial { padding: 8px; }
+.compact-dials .dial select { padding: 8px 10px; font-size: .95rem; }
 @media (max-width: 560px) { .dials { grid-template-columns: 1fr; } }
 .dial {
-  background: var(--panel2); border:1px solid var(--line); border-radius: 14px; padding: 12px;
+  background: var(--panel2); border:1px solid var(--line); border-radius: 12px; padding: 10px;
 }
-.dial label { display:block; font-size:.78rem; color:var(--muted); font-weight:700; text-transform:uppercase; margin-bottom:6px; }
+.dial label { display:block; font-size:.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; margin-bottom:4px; }
 .dial select {
-  width:100%; padding: 12px; border-radius: 10px; border:1px solid #3a4f75;
+  width:100%; padding: 10px; border-radius: 10px; border:1px solid #3a4f75;
   background:#0f1728; color:var(--text); font-weight:700; font-size:1rem;
 }
-.actions { display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 12px; }
+.team-logo-box {
+  display:flex; align-items:center; gap:10px; margin-bottom:8px;
+  background: var(--panel2); border:1px solid var(--line); border-radius:12px; padding:8px 12px;
+}
+.team-logo-label { font-weight:700; font-size:.95rem; }
+.logo-wrap { display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; }
+.team-logo { object-fit: contain; display:block; }
+.logo-sm .team-logo, .logo-sm { width: 22px; height: 22px; }
+.logo-sm .team-logo { width: 22px; height: 22px; }
+.logo-xs .team-logo, .logo-xs { width: 16px; height: 16px; }
+.logo-xs .team-logo { width: 16px; height: 16px; }
+.logo-lg .team-logo { width: 40px; height: 40px; }
+.logo-fallback {
+  display:inline-flex; align-items:center; justify-content:center;
+  background:#243552; color:var(--gold); font-weight:800; font-size:.65rem;
+  border-radius:4px; padding:2px 4px; min-width: 22px; min-height: 18px;
+}
+.logo-lg .logo-fallback { min-width:40px; min-height:28px; font-size:.75rem; }
+.actions { display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 10px; }
 .btn {
-  appearance:none; border:none; cursor:pointer; border-radius: 12px; padding: 14px 16px;
-  font-weight: 800; font-size: 1rem; transition: transform .1s ease, filter .15s;
-  min-height: 48px;
+  appearance:none; border:none; cursor:pointer; border-radius: 12px; padding: 12px 14px;
+  font-weight: 800; font-size: .95rem; transition: transform .1s ease, filter .15s;
+  min-height: 44px;
 }
 .btn:active { transform: scale(.98); }
 .btn-primary { background: linear-gradient(90deg, var(--gold), var(--gold2)); color:#1a1205; flex:1; }
 .btn-secondary { background: #243552; color: var(--text); border:1px solid var(--line); flex:1; }
 .btn-success { background: linear-gradient(90deg, #1fbf8d, #12a87a); color:#042218; flex:1; }
-.btn-danger { background: linear-gradient(90deg, #ff5d6c, #d94858); color:white; flex:1; }
+.btn-danger { background: linear-gradient(90deg, #ff5d6c, #d94858); color:white; flex:0 0 auto; padding-inline: 14px; }
 .btn:disabled { opacity:.45; cursor:not-allowed; }
-.hint { color: var(--muted); font-size: .88rem; margin: 0 0 10px; line-height:1.35; }
-.choices {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-}
+.hint { color: var(--muted); font-size: .85rem; margin: 0 0 8px; line-height:1.35; }
+.hint.slim { font-size: .8rem; margin-bottom: 6px; }
+.choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 @media (max-width: 720px) { .choices { grid-template-columns: 1fr; } }
 .card {
   background: linear-gradient(180deg, #1d2b45, #152036); border:1px solid var(--line);
-  border-radius: 14px; padding: 14px; cursor: pointer; transition: .15s ease; min-height: 140px;
+  border-radius: 14px; padding: 12px; cursor: pointer; transition: .15s ease; min-height: 150px;
   text-align: left; color: inherit; width: 100%;
 }
 .card:hover, .card:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(245,197,66,.25); outline:none; }
-.card .name { font-size: 1.1rem; font-weight: 800; margin: 8px 0 4px; }
-.card .meta { color: var(--muted); font-size: .85rem; }
-.card .rating { font-size: 1.6rem; font-weight: 900; color: var(--green); margin-top: 8px; }
-.card .blurb { font-size: .82rem; color: #b7c6e0; margin-top: 6px; line-height:1.3; }
+.card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.card-head { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.card .name { font-size: 1.05rem; font-weight: 800; margin: 8px 0 2px; }
+.card .jersey, .pname .jersey { color: var(--gold); font-weight: 800; font-size: .9em; }
+.card .stats {
+  color: var(--green); font-size: .82rem; font-weight: 700; margin: 2px 0 4px; line-height: 1.25;
+}
+.card .meta { color: var(--muted); font-size: .78rem; }
+.card .rating { font-size: 1.45rem; font-weight: 900; color: var(--green); margin-top: 6px; }
+.card .blurb { font-size: .78rem; color: #b7c6e0; margin-top: 4px; line-height:1.3; }
+.avatar {
+  display:inline-flex; align-items:center; justify-content:center; border-radius: 50%;
+  overflow: hidden; background: #0f1728; border: 2px solid var(--line); flex-shrink: 0;
+}
+.avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+.avatar-fallback {
+  width:100%; height:100%; align-items:center; justify-content:center;
+  font-weight:900; color: var(--gold); background: linear-gradient(145deg, #243552, #152036);
+}
+.avatar.tier-legend { border-color: rgba(245,197,66,.7); }
+.avatar.tier-star { border-color: rgba(77,163,255,.6); }
+.avatar-md { width: 52px; height: 52px; font-size: .85rem; }
+.avatar-xs { width: 28px; height: 28px; font-size: .6rem; }
 .spinning { animation: pulse 0.5s ease infinite alternate; }
 @keyframes pulse { from { filter: brightness(1); } to { filter: brightness(1.25); } }
-.roster-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap:8px; }
+.roster-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(148px,1fr)); gap:8px; }
 .roster-slot {
-  background: #101a2c; border:1px solid var(--line); border-radius: 10px; padding: 8px 10px; min-height: 64px;
+  background: #101a2c; border:1px solid var(--line); border-radius: 10px; padding: 8px 10px; min-height: 72px;
+  text-align: left; color: inherit; width: 100%;
 }
-.roster-slot.empty { opacity: .55; border-style: dashed; }
-.roster-slot .pos { font-size:.7rem; color:var(--muted); font-weight:800; letter-spacing:.05em; }
-.roster-slot .pname { font-weight:700; font-size:.9rem; margin-top:2px; }
-.roster-slot .prating { color: var(--green); font-weight:800; font-size:.85rem; }
-.section-label { margin: 12px 0 6px; color: var(--gold); font-size:.8rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
+.roster-slot.empty.selectable {
+  opacity: 1; border-style: dashed; border-color: #4a628f; cursor: pointer;
+  background: #121c30;
+}
+.roster-slot.empty.selectable:hover { border-color: var(--gold); }
+.roster-slot.empty.selectable.selected {
+  border-style: solid; border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(245,197,66,.35);
+  background: linear-gradient(180deg, #243556, #1a2740);
+}
+.roster-slot.filled {
+  opacity: .55; filter: grayscale(.35); pointer-events: none; cursor: default;
+  background: #0c1422;
+}
+.roster-slot .pos { font-size:.68rem; color:var(--muted); font-weight:800; letter-spacing:.05em; }
+.roster-slot .pname { font-weight:700; font-size:.86rem; margin-top:2px; }
+.roster-slot .prating { color: var(--green); font-weight:800; font-size:.8rem; }
+.roster-slot .slot-stats { color: #8fa6c9; font-size: .68rem; margin-top: 2px; line-height: 1.2; }
+.slot-row { display:flex; align-items:center; gap:6px; }
+.section-label { margin: 10px 0 6px; color: var(--gold); font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
 .power-bar {
   display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
-  background:#101a2c; border-radius:12px; padding:10px 12px; border:1px solid var(--line); margin-top:10px;
+  background:#101a2c; border-radius:12px; padding:8px 10px; border:1px solid var(--line);
 }
+.power-bar.inline { margin:0; padding:6px 10px; font-size:.85rem; }
 .week-list { display:flex; flex-direction:column; gap:6px; max-height: 360px; overflow:auto; }
 .week-row {
   display:grid; grid-template-columns: 56px 1fr auto; gap:8px; align-items:center;
@@ -156,54 +222,70 @@ button, select { font: inherit; }
 .celebrate h2 { font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--gold); }
 .hidden { display:none !important; }
 .progress {
-  height: 8px; background:#0f1728; border-radius:999px; overflow:hidden; margin: 8px 0 0;
+  height: 6px; background:#0f1728; border-radius:999px; overflow:hidden; margin: 6px 0 0;
 }
 .progress > span { display:block; height:100%; background: linear-gradient(90deg, var(--gold), var(--green)); width:0%; transition: width .3s ease; }
-.footer-note { color:#7f92b3; font-size:.78rem; text-align:center; margin-top: 8px; }
+.footer-note { color:#7f92b3; font-size:.75rem; text-align:center; margin-top: 6px; }
 
 </style>
 </head>
 <body>
   <div class="wrap">
-    <header class="hero">
+    <header class="hero compact">
       <h1>NFL Decade Spin</h1>
-      <p>
-        Spin a decade + franchise. Draft the <strong>top 3 by best season</strong> at each position
-        for that team in that decade. Stack Starters, Stars &amp; Legends. Run the table at 17-0.
-        Then duel coaches, playoff heroes, and Super Bowl MVPs.
-      </p>
+      <p class="hero-sub">Pick a slot · spin decade + team · draft peak-season legends · chase 17-0.</p>
     </header>
 
-    <nav class="tabs" aria-label="Game sections">
-      <button class="tab active" id="tab-build" type="button">Build Roster</button>
+    <!-- START / NEW GAME -->
+    <section id="view-start">
+      <div class="panel start-panel">
+        <h2>New Game</h2>
+        <p class="hint">Tap any empty depth-chart slot, spin a decade + franchise, and pick from the top 3 by best season.</p>
+        <label class="toggle-row" for="infiniteRespins">
+          <span>
+            <strong>Infinite respins</strong>
+            <span class="hint" style="margin:0;display:block">Off = 4 respins per build (first reveal per slot is free).</span>
+          </span>
+          <input type="checkbox" id="infiniteRespins" />
+        </label>
+        <div class="actions" style="margin-top:14px">
+          <button class="btn btn-primary" id="btnStartGame" type="button">Start Building</button>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tabs hidden" id="mainTabs" aria-label="Game sections">
+      <button class="tab active" id="tab-build" type="button">Build</button>
       <button class="tab" id="tab-season" type="button" disabled>Season</button>
       <button class="tab" id="tab-playoffs" type="button" disabled>Playoffs</button>
     </nav>
 
     <!-- BUILD -->
-    <section id="view-build">
+    <section id="view-build" class="hidden">
       <div class="panel">
-        <h2>Dial it up</h2>
-        <div id="slotBanner" class="slot-banner"></div>
-        <div class="dials">
+        <div class="build-top">
+          <div id="slotBanner" class="slot-banner compact"></div>
+          <div id="respinMeter" class="respin-meter"></div>
+        </div>
+
+        <div id="teamLogoBox" class="team-logo-box"></div>
+        <div class="dials compact-dials">
           <div class="dial">
             <label for="decadeSelect">Decade</label>
             <select id="decadeSelect"></select>
           </div>
           <div class="dial">
-            <label for="teamSelect">NFL Team</label>
+            <label for="teamSelect">Team</label>
             <select id="teamSelect"></select>
           </div>
         </div>
         <div class="actions">
-          <button class="btn btn-primary" id="btnSpin" type="button">SPIN Random</button>
+          <button class="btn btn-primary" id="btnSpin" type="button">SPIN</button>
           <button class="btn btn-secondary" id="btnReveal" type="button">Reveal Top 3</button>
+          <button class="btn btn-danger" id="btnNewGame" type="button" title="New Game">New</button>
         </div>
-        <p class="hint">
-          Choices are that franchise’s best at this position in that decade — ranked by each player’s peak season with the club. Weak eras still get their real depth-chart best (often Starter tier).
-        </p>
         <div id="choices" class="choices"></div>
-        <div id="buildComplete" class="hidden" style="margin-top:14px">
+        <div id="buildComplete" class="hidden" style="margin-top:12px">
           <div class="actions">
             <button class="btn btn-success" id="btnSimSeason" type="button">Simulate Season (17 games)</button>
           </div>
@@ -211,10 +293,13 @@ button, select { font: inherit; }
       </div>
 
       <div class="panel">
-        <h2>Your Roster</h2>
-        <div id="powerBar" class="power-bar"></div>
+        <div class="panel-head">
+          <h2>Depth Chart</h2>
+          <div id="powerBar" class="power-bar inline"></div>
+        </div>
+        <p class="hint slim">Tap an empty slot to fill it — any order. Filled slots are locked.</p>
         <div id="rosterGrid"></div>
-        <p class="footer-note">2-back offense · 4-3 defense · K / P / RET</p>
+        <p class="footer-note">2-back · 4-3 · K / P / RET</p>
       </div>
     </section>
 
@@ -223,7 +308,7 @@ button, select { font: inherit; }
       <div class="panel">
         <h2>Regular Season — Chase 17-0</h2>
         <p class="hint" id="seasonPower"></p>
-        <p class="hint">Each week your roster power + chaos faces a generated opponent. Survive all 17 to unlock the playoff gauntlet.</p>
+        <p class="hint slim">Roster power + chaos vs weekly opponents. Go 17-0 to unlock playoffs.</p>
         <div class="actions">
           <button class="btn btn-primary" id="btnStartSeason" type="button">Simulate / Resim Season</button>
         </div>
@@ -232,7 +317,7 @@ button, select { font: inherit; }
         <div id="seasonActions" class="actions hidden" style="margin-top:12px">
           <button class="btn btn-success hidden" id="btnPlayoffs" type="button">Enter Playoffs</button>
           <button class="btn btn-secondary" id="btnResim" type="button">Resim Season</button>
-          <button class="btn btn-danger" id="btnRebuild" type="button">Rebuild Roster</button>
+          <button class="btn btn-danger" id="btnRebuild" type="button">New Game</button>
         </div>
       </div>
     </section>
@@ -241,7 +326,7 @@ button, select { font: inherit; }
     <section id="view-playoffs" class="hidden">
       <div class="panel">
         <h2>Playoff Gauntlet</h2>
-        <p class="hint">Three duels. You pick from a decade’s top 5. CPU rolls its own decade + pick. Higher rating advances.</p>
+        <p class="hint slim">Three duels. Spin a decade, pick from the top 5, beat the CPU by rating.</p>
         <div id="playoffRoot"></div>
       </div>
     </section>
@@ -257,17 +342,27 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
 /* NFL Decade Spin — game logic */
 (function () {
   const D = () => window.NFL_DATA;
+  const DEFAULT_RESPINS = 4;
+
+  const ESPN_LOGO = {"ARI":"ari","ATL":"atl","BAL":"bal","BUF":"buf","CAR":"car","CHI":"chi","CIN":"cin","CLE":"cle","DAL":"dal","DEN":"den","DET":"det","GB":"gb","HOU":"hou","IND":"ind","JAX":"jax","KC":"kc","LAC":"lac","LAR":"lar","LV":"lv","MIA":"mia","MIN":"min","NE":"ne","NO":"no","NYG":"nyg","NYJ":"nyj","PHI":"phi","PIT":"pit","SEA":"sea","SF":"sf","TB":"tb","TEN":"ten","WAS":"wsh","OAK":"lv","SD":"lac","STL":"lar","LA":"lar","RAI":"lv","PHX":"ari","BOS":"ne","HOU_OIL":"ten"};
+  const KNOWN_JERSEY = {"Tom Brady":12,"Jerry Rice":80,"Joe Montana":16,"Steve Young":8,"Patrick Mahomes":15,"Peyton Manning":18,"Brett Favre":4,"Aaron Rodgers":12,"Dan Marino":13,"John Elway":7,"Barry Sanders":20,"Emmitt Smith":22,"Walter Payton":34,"Jim Brown":32,"LaDainian Tomlinson":21,"Adrian Peterson":28,"Derrick Henry":22,"Marshawn Lynch":24,"Priest Holmes":31,"Curtis Martin":28,"Randy Moss":81,"Calvin Johnson":81,"Larry Fitzgerald":11,"Antonio Brown":84,"DeAndre Hopkins":10,"Davante Adams":17,"Tyreek Hill":10,"Cooper Kupp":10,"Julio Jones":11,"Michael Irvin":88,"Cris Carter":80,"Tim Brown":81,"Steve Largent":80,"Art Monk":81,"Charlie Joiner":18,"Rob Gronkowski":87,"Tony Gonzalez":88,"Antonio Gates":85,"Travis Kelce":87,"Shannon Sharpe":84,"Mike Ditka":89,"Dave Casper":87,"Jason Witten":82,"Dallas Clark":44,"Lawrence Taylor":56,"Ray Lewis":52,"Brian Urlacher":54,"Dick Butkus":51,"Jack Lambert":58,"Bobby Wagner":54,"Luke Kuechly":59,"Ray Nitschke":66,"Mike Singletary":50,"Derrick Brooks":55,"Reggie White":92,"Bruce Smith":78,"JJ Watt":99,"Aaron Donald":99,"Mean Joe Greene":75,"Deacon Jones":75,"Justin Houston":50,"Von Miller":40,"T.J. Watt":90,"Khalil Mack":52,"Deion Sanders":21,"Champ Bailey":24,"Charles Woodson":24,"Darrelle Revis":24,"Richard Sherman":25,"Rod Woodson":26,"Mel Blount":47,"Ty Law":24,"Asante Samuel":22,"Ed Reed":20,"Troy Polamalu":43,"Ronnie Lott":42,"Sean Taylor":21,"Kam Chancellor":31,"Earl Thomas":29,"Brian Dawkins":20,"Steve Atwater":27,"Rodney Harrison":37,"Lawyer Milloy":36,"Anthony Munoz":71,"Jonathan Ogden":75,"Walter Jones":71,"Orlando Pace":76,"Joe Thomas":73,"Tackle Larry Allen":73,"Larry Allen":73,"John Hannah":73,"Bruce Matthews":74,"Zack Martin":70,"Mike Webster":52,"Dermontti Dawson":63,"Kevin Mawae":68,"Jason Kelce":62,"Travis Frederick":72,"Adam Vinatieri":4,"Justin Tucker":9,"Stephen Gostkowski":3,"Morten Andersen":5,"Gary Anderson":1,"Ray Guy":8,"Shane Lechler":9,"Pat McAfee":1,"Johnny Hekker":6,"Devin Hester":23,"Dante Hall":82,"Josh Cribbs":16,"Gale Sayers":40,"Billy Johnson":81,"Troy Brown":80,"Wes Welker":83,"Julian Edelman":11,"Brandin Cooks":14,"James White":28,"LeGarrette Blount":29,"Stevan Ridley":22,"Corey Dillon":28,"Antowain Smith":32,"Kevin Faulk":33,"Matt Light":72,"Logan Mankins":70,"Dan Koppen":67,"Richard Seymour":93,"Vince Wilfork":75,"Tedy Bruschi":54,"Mike Vrabel":50,"Willie McGinest":55,"Joe Namath":12,"Johnny Unitas":19,"Bart Starr":15,"Roger Staubach":12,"Terry Bradshaw":12,"Len Dawson":16,"Fran Tarkenton":10,"Bob Griese":12,"Ken Stabler":12,"Dan Fouts":14,"Joe Theismann":7,"Jim Kelly":12,"Troy Aikman":8,"Steve McNair":9,"Kurt Warner":13,"Drew Brees":9,"Eli Manning":10,"Ben Roethlisberger":7,"Philip Rivers":17,"Russell Wilson":3,"Cam Newton":1,"Lamar Jackson":8,"Josh Allen":17,"Joe Burrow":9,"Justin Herbert":10,"Jalen Hurts":1,"Dak Prescott":4,"Matthew Stafford":9,"Kirk Cousins":8,"Andrew Luck":12,"Carson Wentz":11,"Baker Mayfield":6,"Deshaun Watson":4,"Kyler Murray":1,"C.J. Stroud":7,"Brock Purdy":13,"Mac Jones":10,"Trevor Lawrence":16,"Justin Fields":1,"Saquon Barkley":26,"Christian McCaffrey":23,"Alvin Kamara":41,"Ezekiel Elliott":21,"Frank Gore":21,"Edgerrin James":32,"Marshall Faulk":28,"Thurman Thomas":34,"Marcus Allen":32,"Eric Dickerson":29,"O.J. Simpson":32,"Franco Harris":32,"Earl Campbell":34,"Tony Dorsett":33,"Marvin Harrison":88,"Torry Holt":81,"Isaac Bruce":80,"Hines Ward":86,"Anquan Boldin":81,"Steve Smith Sr.":89,"Andre Johnson":80,"A.J. Green":18,"Odell Beckham Jr.":13,"Mike Evans":13,"Chris Godwin":14,"Stefon Diggs":14,"Ja'Marr Chase":1,"Justin Jefferson":18,"CeeDee Lamb":88,"Amon-Ra St. Brown":14,"Puka Nacua":17,"Garrett Wilson":5,"Aaron Hernandez":81,"Jimmy Garoppolo":10,"Brian Hoyer":8,"Drew Bledsoe":11,"Steve Grogan":14,"Babe Parilli":15,"Colin Kaepernick":7,"Alex Smith":11,"Jeff Garcia":5,"John Brodie":12,"Roger Craig":33,"Dwight Clark":87,"John Taylor":82,"Terrell Owens":81,"Brent Jones":84,"Charles Haley":94,"Fred Dean":74,"Harris Barton":79,"Steve Wallace":74,"Bo Jackson":34,"Howie Long":75,"Jim Plunkett":16,"Rich Gannon":12,"Derek Carr":4,"Maxx Crosby":98,"Cliff Branch":21,"Fred Biletnikoff":25,"Art Shell":78,"Gene Upshaw":63,"Jim Otto":0,"Kenny Stabler":12,"Reggie Wayne":87,"T.Y. Hilton":13,"Quenton Nelson":56,"Jonathan Taylor":28,"Joe Flacco":5,"Haloti Ngata":92,"Terrell Suggs":55,"Mark Andrews":89,"Jamison Crowder":80,"James Harrison":92,"Lynn Swann":88,"John Stallworth":82,"Jack Ham":59,"Najee Harris":22,"TJ Watt":90,"Minkah Fitzpatrick":39,"Donald Driver":80,"Jordy Nelson":87,"James Lofton":80,"Sterling Sharpe":84,"Ahman Green":30,"Eddie Lacy":27,"Clay Matthews":58,"Willie Wood":24,"Michael Thomas":13,"Marques Colston":12,"Jimmy Graham":80,"Cameron Jordan":94,"Demario Davis":56,"Marshon Lattimore":23,"Taysom Hill":7,"DK Metcalf":14,"Tyler Lockett":16,"Cortez Kennedy":96,"Matt Ryan":2,"Roddy White":84,"Michael Vick":7,"Warrick Dunn":28,"Jamal Anderson":32,"Grady Jarrett":97,"Herman Moore":98,"Jared Goff":16,"Sam LaPorta":87,"Aid an Hutchinson":97,"Aidan Hutchinson":97,"Dez Bryant":88,"DeMarcus Ware":94,"Darren Woodson":28,"Tony Romo":9,"Amari Cooper":89,"Micah Parsons":11,"A.J. Brown":11,"DeVonta Smith":6,"Fletcher Cox":91,"Donovan McNabb":5,"Brian Westbrook":36,"Nick Foles":9,"Zach Ertz":86,"Lane Johnson":65,"Brandon Graham":55,"Andre Reed":83,"Cookie Gilchrist":34,"OJ Simpson":32,"Fred Jackson":22,"Terrell Davis":30,"Demaryius Thomas":88,"Emmanuel Sanders":10,"Lenny Dawson":16,"Jamaal Charles":25,"Derrick Thomas":58,"Eric Berry":29,"Chris Jones":95,"Clyde Edwards-Helaire":25,"Isiah Pacheco":10,"Rashee Rice":4,"Mark Clayton":83,"Mark Duper":85,"Jason Taylor":99,"Zach Thomas":54,"Ricky Williams":34,"Cameron Wake":91,"Jarvis Landry":80,"Tua Tagovailoa":1,"Jaylen Waddle":17,"Larry Csonka":39,"Paul Warfield":42,"Nick Buoniconti":85,"Alan Page":88,"Carl Eller":81,"John Randle":93,"Antoine Winfield":26,"Dalvin Cook":33,"Harrison Smith":22,"Adam Thielen":19,"Victor Cruz":80,"Michael Strahan":92,"Phil Simms":11,"Y.A. Tittle":14,"Frank Gifford":16,"Daniel Jones":8,"Don Maynard":13,"Mark Gastineau":99,"Wayne Chrebet":80,"Jamal Adams":33,"Sauce Gardner":1,"Breece Hall":20,"Warren Sapp":99,"John Lynch":47,"Ronde Barber":20,"Jameis Winston":3,"Doug Martin":22,"Gerald McCoy":93,"Lavonte David":54,"Vita Vea":50,"Mike Alstott":40,"Eddie George":27,"Keith Bulluck":53,"Jevon Kearse":90,"AJ Brown":11,"Ryan Tannehill":17,"Marcus Mariota":8,"Jeff Fisher":0,"Warren Moon":1,"Robert Woods":2,"J.J. Watt":99,"Arian Foster":23,"Jalen Ramsey":5,"Jadeveon Clowney":90,"Will Anderson":51,"Nico Collins":12,"Joe Mixon":28,"Tee Higgins":5,"Chad Johnson":85,"Carson Palmer":3,"Genno Atkins":97,"Genio Atkins":97,"Geno Atkins":97,"Vonn Bell":24,"Jessie Bates":30,"Boomer Esiason":7,"Ken Anderson":14,"Ickey Woods":30,"Myles Garrett":95,"Nick Chubb":24,"Ozzie Newsome":82,"Bernie Kosar":19,"Josh Gordon":12,"Brian Sipe":17,"Hanford Dixon":29,"Thomas Davis":58,"Greg Olsen":88,"Julius Peppers":90,"Muhsin Muhammad":87,"Jake Delhomme":17,"Jonathan Stewart":28,"Bryce Young":9,"DJ Moore":2,"Brian Burns":0,"Derrick Brown":95,"Blake Bortles":5,"Fred Taylor":28,"Maurice Jones-Drew":32,"Jimmy Smith":82,"Tony Boselli":71,"Calais Campbell":93,"Travis Etienne":1,"Mark Brunell":8,"Keenan Allen":13,"Joey Bosa":97,"Kellen Winslow":80,"Junior Seau":55,"Leslie Frazier":0,"Austin Ekeler":30,"Derwin James":3,"Lance Alworth":19,"Todd Gurley":30,"Jack Youngblood":85,"Merlin Olsen":74,"Kyren Williams":23,"Patrick Peterson":21,"Chandler Jones":55,"David Johnson":31,"James Conner":6,"Marvin Harrison Jr.":18,"Neil Lomax":15,"Aeneas Williams":35,"Jake Plummer":16,"Pat Tillman":40,"Sam Bradford":8,"Chase Young":99,"Terry McLaurin":17,"John Riggins":44,"Darrell Green":28,"Sonny Jurgensen":9,"RG3":10,"Robert Griffin III":10,"Clinton Portis":26,"Chris Cooley":47,"Ryan Kerrigan":91,"Jayden Daniels":5,"Brian Robinson":8,"Lester Hayes":37,"Willie Brown":24,"Sebastian Janikowski":11,"Josh Jacobs":8,"Aidan O'Connell":12,"George Kittle":85,"Nick Bosa":97,"Fred Warner":54,"Deebo Samuel":19,"Brandon Aiyuk":11,"Patrick Willis":52,"Vernon Davis":85,"Justin Smith":94,"NaVorro Bowman":53,"Bryant Young":97,"Matt Cassel":16,"Bailey Zappe":4,"Jacoby Brissett":7,"Scott Zolak":16,"Tony Eason":11,"Mike Taliaferro":17,"Tom Sherman":14,"Ben Watson":84,"Christian Fauria":86,"Daniel Graham":82,"Damien Woody":65,"Nick Kaczur":77,"Joe Andruzzi":63,"Josh Miller":8,"Ken Walter":13,"Chris Hanson":8,"Ellis Hobbs":27,"Ty Warren":94,"Ted Washington":92};
+  const KNOWN_PHOTO = {"Tom Brady":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Tom_Brady_2019.jpg/120px-Tom_Brady_2019.jpg","Jerry Rice":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Jerry_Rice_2010.jpg/120px-Jerry_Rice_2010.jpg","Joe Montana":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Joe_Montana_2016.jpg/120px-Joe_Montana_2016.jpg","Patrick Mahomes":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Patrick_Mahomes_2022.jpg/120px-Patrick_Mahomes_2022.jpg","Peyton Manning":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Peyton_Manning_%28cropped%29.jpg/120px-Peyton_Manning_%28cropped%29.jpg","Brett Favre":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Brett_Favre_2009.jpg/120px-Brett_Favre_2009.jpg","Aaron Rodgers":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Aaron_Rodgers_2019.jpg/120px-Aaron_Rodgers_2019.jpg","Dan Marino":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Dan_Marino_2012.jpg/120px-Dan_Marino_2012.jpg","John Elway":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/John_Elway_2016.jpg/120px-John_Elway_2016.jpg","Barry Sanders":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Barry_Sanders_2019.jpg/120px-Barry_Sanders_2019.jpg","Emmitt Smith":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Emmitt_Smith_2016.jpg/120px-Emmitt_Smith_2016.jpg","Walter Payton":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Walter_Payton.jpg/120px-Walter_Payton.jpg","Randy Moss":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Randy_Moss_2017.jpg/120px-Randy_Moss_2017.jpg","Calvin Johnson":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Calvin_Johnson_2013.jpg/120px-Calvin_Johnson_2013.jpg","Lawrence Taylor":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Lawrence_Taylor_2017.jpg/120px-Lawrence_Taylor_2017.jpg","Ray Lewis":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Ray_Lewis_2011.jpg/120px-Ray_Lewis_2011.jpg","Deion Sanders":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Deion_Sanders_2011.jpg/120px-Deion_Sanders_2011.jpg","Rob Gronkowski":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Rob_Gronkowski_2017.jpg/120px-Rob_Gronkowski_2017.jpg","Travis Kelce":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Travis_Kelce_2021.jpg/120px-Travis_Kelce_2021.jpg","Drew Brees":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Drew_Brees_2019.jpg/120px-Drew_Brees_2019.jpg","Aaron Donald":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Aaron_Donald_2019.jpg/120px-Aaron_Donald_2019.jpg","JJ Watt":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/J.J._Watt_2019.jpg/120px-J.J._Watt_2019.jpg","J.J. Watt":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/J.J._Watt_2019.jpg/120px-J.J._Watt_2019.jpg","Lamar Jackson":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Lamar_Jackson_2019.jpg/120px-Lamar_Jackson_2019.jpg","Josh Allen":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Josh_Allen_2022.jpg/120px-Josh_Allen_2022.jpg","Joe Burrow":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Joe_Burrow_2021.jpg/120px-Joe_Burrow_2021.jpg","Steve Young":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Steve_Young_2016.jpg/120px-Steve_Young_2016.jpg","Troy Aikman":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Troy_Aikman_2016.jpg/120px-Troy_Aikman_2016.jpg","Terry Bradshaw":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Terry_Bradshaw_2018.jpg/120px-Terry_Bradshaw_2018.jpg","Joe Namath":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Joe_Namath_cropped.jpg/120px-Joe_Namath_cropped.jpg","Johnny Unitas":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Johnny_Unitas_1959.jpg/120px-Johnny_Unitas_1959.jpg","Jim Brown":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Jim_Brown_Cleveland_Browns.jpg/120px-Jim_Brown_Cleveland_Browns.jpg","Mean Joe Greene":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Joe_Greene_2013.jpg/120px-Joe_Greene_2013.jpg","Reggie White":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Reggie_White.jpg/120px-Reggie_White.jpg","Bruce Smith":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Bruce_Smith_2014.jpg/120px-Bruce_Smith_2014.jpg","Ed Reed":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Ed_Reed_2012.jpg/120px-Ed_Reed_2012.jpg","Troy Polamalu":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Troy_Polamalu_2013.jpg/120px-Troy_Polamalu_2013.jpg","Ronnie Lott":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Ronnie_Lott_2018.jpg/120px-Ronnie_Lott_2018.jpg","Adam Vinatieri":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Adam_Vinatieri_2019.jpg/120px-Adam_Vinatieri_2019.jpg","Justin Tucker":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Justin_Tucker_2022.jpg/120px-Justin_Tucker_2022.jpg","Derrick Henry":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Derrick_Henry_2018.jpg/120px-Derrick_Henry_2018.jpg","Saquon Barkley":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Saquon_Barkley_2019.jpg/120px-Saquon_Barkley_2019.jpg","Christian McCaffrey":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Christian_McCaffrey_2019.jpg/120px-Christian_McCaffrey_2019.jpg","Justin Jefferson":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Justin_Jefferson_2022.jpg/120px-Justin_Jefferson_2022.jpg","Ja'Marr Chase":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Ja%27Marr_Chase_2021.jpg/120px-Ja%27Marr_Chase_2021.jpg","Davante Adams":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Davante_Adams_2021.jpg/120px-Davante_Adams_2021.jpg","Tyreek Hill":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Tyreek_Hill_2021.jpg/120px-Tyreek_Hill_2021.jpg","Cooper Kupp":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Cooper_Kupp_2021.jpg/120px-Cooper_Kupp_2021.jpg","Von Miller":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Von_Miller_2018.jpg/120px-Von_Miller_2018.jpg","T.J. Watt":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/T.J._Watt_2021.jpg/120px-T.J._Watt_2021.jpg","Myles Garrett":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Myles_Garrett_2021.jpg/120px-Myles_Garrett_2021.jpg","Russell Wilson":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Russell_Wilson_2018.jpg/120px-Russell_Wilson_2018.jpg","Cam Newton":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Cam_Newton_2019.jpg/120px-Cam_Newton_2019.jpg","Ben Roethlisberger":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Ben_Roethlisberger_2019.jpg/120px-Ben_Roethlisberger_2019.jpg","Eli Manning":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Eli_Manning_2017.jpg/120px-Eli_Manning_2017.jpg","Philip Rivers":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Philip_Rivers_2019.jpg/120px-Philip_Rivers_2019.jpg","Matthew Stafford":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Matthew_Stafford_2022.jpg/120px-Matthew_Stafford_2022.jpg","Dak Prescott":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Dak_Prescott_2019.jpg/120px-Dak_Prescott_2019.jpg","Jalen Hurts":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Jalen_Hurts_2022.jpg/120px-Jalen_Hurts_2022.jpg","Justin Herbert":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Justin_Herbert_2021.jpg/120px-Justin_Herbert_2021.jpg","C.J. Stroud":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/C.J._Stroud_2023.jpg/120px-C.J._Stroud_2023.jpg","Brock Purdy":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Brock_Purdy_2023.jpg/120px-Brock_Purdy_2023.jpg","Tony Gonzalez":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Tony_Gonzalez_2013.jpg/120px-Tony_Gonzalez_2013.jpg","Antonio Gates":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Antonio_Gates_2019.jpg/120px-Antonio_Gates_2019.jpg","Larry Fitzgerald":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Larry_Fitzgerald_2017.jpg/120px-Larry_Fitzgerald_2017.jpg","Marshawn Lynch":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Marshawn_Lynch_2018.jpg/120px-Marshawn_Lynch_2018.jpg","Adrian Peterson":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Adrian_Peterson_2019.jpg/120px-Adrian_Peterson_2019.jpg","LaDainian Tomlinson":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/LaDainian_Tomlinson_2017.jpg/120px-LaDainian_Tomlinson_2017.jpg","Frank Gore":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Frank_Gore_2019.jpg/120px-Frank_Gore_2019.jpg","Julian Edelman":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Julian_Edelman_2017.jpg/120px-Julian_Edelman_2017.jpg","Wes Welker":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Wes_Welker_2012.jpg/120px-Wes_Welker_2012.jpg","Richard Sherman":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Richard_Sherman_2018.jpg/120px-Richard_Sherman_2018.jpg","Champ Bailey":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Champ_Bailey_2014.jpg/120px-Champ_Bailey_2014.jpg","Charles Woodson":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Charles_Woodson_2015.jpg/120px-Charles_Woodson_2015.jpg","Darrelle Revis":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Darrelle_Revis_2015.jpg/120px-Darrelle_Revis_2015.jpg","Bobby Wagner":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bobby_Wagner_2019.jpg/120px-Bobby_Wagner_2019.jpg","Luke Kuechly":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Luke_Kuechly_2016.jpg/120px-Luke_Kuechly_2016.jpg","Brian Urlacher":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Brian_Urlacher_2012.jpg/120px-Brian_Urlacher_2012.jpg","Dick Butkus":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Dick_Butkus_2017.jpg/120px-Dick_Butkus_2017.jpg","Bart Starr":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bart_Starr_2012.jpg/120px-Bart_Starr_2012.jpg","Roger Staubach":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Roger_Staubach_2014.jpg/120px-Roger_Staubach_2014.jpg","Kurt Warner":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Kurt_Warner_2014.jpg/120px-Kurt_Warner_2014.jpg","Andrew Luck":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Andrew_Luck_2018.jpg/120px-Andrew_Luck_2018.jpg","Michael Vick":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Michael_Vick_2017.jpg/120px-Michael_Vick_2017.jpg","Donovan McNabb":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Donovan_McNabb_2013.jpg/120px-Donovan_McNabb_2013.jpg","Steve McNair":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Steve_McNair_2006.jpg/120px-Steve_McNair_2006.jpg","Warren Moon":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Warren_Moon_2019.jpg/120px-Warren_Moon_2019.jpg","Fran Tarkenton":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Fran_Tarkenton_2013.jpg/120px-Fran_Tarkenton_2013.jpg","Bob Griese":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Bob_Griese_2013.jpg/120px-Bob_Griese_2013.jpg","Len Dawson":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Len_Dawson_2014.jpg/120px-Len_Dawson_2014.jpg","Ken Stabler":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Ken_Stabler.jpg/120px-Ken_Stabler.jpg","Jim Kelly":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Jim_Kelly_2010.jpg/120px-Jim_Kelly_2010.jpg","Dan Fouts":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Dan_Fouts_2017.jpg/120px-Dan_Fouts_2017.jpg","Bo Jackson":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Bo_Jackson_2019.jpg/120px-Bo_Jackson_2019.jpg","Marcus Allen":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Marcus_Allen_2013.jpg/120px-Marcus_Allen_2013.jpg","Eric Dickerson":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Eric_Dickerson_2019.jpg/120px-Eric_Dickerson_2019.jpg","O.J. Simpson":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/O.J._Simpson_1990.jpg/120px-O.J._Simpson_1990.jpg","Gale Sayers":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Gale_Sayers_2008.jpg/120px-Gale_Sayers_2008.jpg","Earl Campbell":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Earl_Campbell_2019.jpg/120px-Earl_Campbell_2019.jpg","Franco Harris":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Franco_Harris_2013.jpg/120px-Franco_Harris_2013.jpg","Tony Dorsett":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Tony_Dorsett_2017.jpg/120px-Tony_Dorsett_2017.jpg","Thurman Thomas":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Thurman_Thomas_2014.jpg/120px-Thurman_Thomas_2014.jpg","Marshall Faulk":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Marshall_Faulk_2017.jpg/120px-Marshall_Faulk_2017.jpg","Edgerrin James":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Edgerrin_James_2019.jpg/120px-Edgerrin_James_2019.jpg","Curtis Martin":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Curtis_Martin_2012.jpg/120px-Curtis_Martin_2012.jpg","Priest Holmes":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Priest_Holmes_2014.jpg/120px-Priest_Holmes_2014.jpg","Terrell Davis":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Terrell_Davis_2017.jpg/120px-Terrell_Davis_2017.jpg","Michael Irvin":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Michael_Irvin_2017.jpg/120px-Michael_Irvin_2017.jpg","Cris Carter":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Cris_Carter_2014.jpg/120px-Cris_Carter_2014.jpg","Tim Brown":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Tim_Brown_2015.jpg/120px-Tim_Brown_2015.jpg","Steve Largent":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Steve_Largent_2014.jpg/120px-Steve_Largent_2014.jpg","Art Monk":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Art_Monk_2013.jpg/120px-Art_Monk_2013.jpg","Terrell Owens":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Terrell_Owens_2017.jpg/120px-Terrell_Owens_2017.jpg","Marvin Harrison":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Marvin_Harrison_2016.jpg/120px-Marvin_Harrison_2016.jpg","Andre Johnson":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Andre_Johnson_2019.jpg/120px-Andre_Johnson_2019.jpg","Julio Jones":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Julio_Jones_2019.jpg/120px-Julio_Jones_2019.jpg","Antonio Brown":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Antonio_Brown_2015.jpg/120px-Antonio_Brown_2015.jpg","DeAndre Hopkins":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/DeAndre_Hopkins_2019.jpg/120px-DeAndre_Hopkins_2019.jpg","Mike Evans":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Mike_Evans_2019.jpg/120px-Mike_Evans_2019.jpg","Odell Beckham Jr.":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Odell_Beckham_Jr_2019.jpg/120px-Odell_Beckham_Jr_2019.jpg","Stefon Diggs":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Stefon_Diggs_2021.jpg/120px-Stefon_Diggs_2021.jpg","CeeDee Lamb":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/CeeDee_Lamb_2021.jpg/120px-CeeDee_Lamb_2021.jpg","Amon-Ra St. Brown":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Amon-Ra_St._Brown_2022.jpg/120px-Amon-Ra_St._Brown_2022.jpg","Shannon Sharpe":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Shannon_Sharpe_2014.jpg/120px-Shannon_Sharpe_2014.jpg","Jason Witten":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Jason_Witten_2019.jpg/120px-Jason_Witten_2019.jpg","Mike Ditka":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Mike_Ditka_2012.jpg/120px-Mike_Ditka_2012.jpg","Anthony Munoz":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Anthony_Munoz_2013.jpg/120px-Anthony_Munoz_2013.jpg","Jonathan Ogden":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Jonathan_Ogden_2013.jpg/120px-Jonathan_Ogden_2013.jpg","Larry Allen":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Larry_Allen_2013.jpg/120px-Larry_Allen_2013.jpg","John Hannah":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/John_Hannah_2013.jpg/120px-John_Hannah_2013.jpg","Bruce Matthews":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Bruce_Matthews_2014.jpg/120px-Bruce_Matthews_2014.jpg","Mike Webster":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Mike_Webster.jpg/120px-Mike_Webster.jpg","Jason Kelce":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Jason_Kelce_2022.jpg/120px-Jason_Kelce_2022.jpg","Deacon Jones":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Deacon_Jones.jpg/120px-Deacon_Jones.jpg","Howie Long":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Howie_Long_2015.jpg/120px-Howie_Long_2015.jpg","Michael Strahan":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Michael_Strahan_2016.jpg/120px-Michael_Strahan_2016.jpg","Jack Lambert":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Jack_Lambert_2014.jpg/120px-Jack_Lambert_2014.jpg","Ray Nitschke":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Ray_Nitschke.jpg/120px-Ray_Nitschke.jpg","Mike Singletary":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Mike_Singletary_2013.jpg/120px-Mike_Singletary_2013.jpg","Derrick Brooks":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Derrick_Brooks_2014.jpg/120px-Derrick_Brooks_2014.jpg","Junior Seau":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Junior_Seau_2012.jpg/120px-Junior_Seau_2012.jpg","Khalil Mack":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Khalil_Mack_2018.jpg/120px-Khalil_Mack_2018.jpg","Mel Blount":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Mel_Blount_2014.jpg/120px-Mel_Blount_2014.jpg","Rod Woodson":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Rod_Woodson_2016.jpg/120px-Rod_Woodson_2016.jpg","Brian Dawkins":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Brian_Dawkins_2018.jpg/120px-Brian_Dawkins_2018.jpg","Sean Taylor":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Sean_Taylor.jpg/120px-Sean_Taylor.jpg","Kam Chancellor":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Kam_Chancellor_2014.jpg/120px-Kam_Chancellor_2014.jpg","Earl Thomas":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Earl_Thomas_2014.jpg/120px-Earl_Thomas_2014.jpg","Steve Atwater":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Steve_Atwater_2014.jpg/120px-Steve_Atwater_2014.jpg","Devin Hester":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Devin_Hester_2014.jpg/120px-Devin_Hester_2014.jpg"};
+
   const state = {
-    view: "build",
-    roster: {}, // pos -> player
+    view: "start",
+    started: false,
+    roster: {},
     fillOrder: null,
-    nextIndex: 0,
+    selectedSlot: null,
+    slotHasReveal: false,
     decade: "2000s",
     team: "NE",
     choices: null,
-    season: null, // {weeks:[], record:{w,l}, power}
+    season: null,
     undefeated: false,
-    playoff: null, // {round, decade, choices, pick, cpu, result, won}
+    playoff: null,
+    respinsLeft: DEFAULT_RESPINS,
+    infiniteRespins: false,
   };
 
   const ROUND_META = [
@@ -276,7 +371,6 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
     { id: "superbowl", title: "Super Bowl", blurb: "Super Bowl MVPs — win this and the decade is yours.", bucket: "sbMvps", label: "SB MVP" },
   ];
 
-  function $(sel) { return document.querySelector(sel); }
   function el(id) { return document.getElementById(id); }
 
   function fillOrder() {
@@ -284,16 +378,16 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
     return [...d.offense, ...d.defense, ...d.special];
   }
 
-  function currentSlot() {
-    return state.fillOrder[state.nextIndex] || null;
-  }
-
   function rosterPower() {
     return Object.values(state.roster).reduce((s, p) => s + (p.rating || 0), 0);
   }
 
   function rosterFull() {
-    return state.nextIndex >= state.fillOrder.length;
+    return state.fillOrder.every((pos) => !!state.roster[pos]);
+  }
+
+  function emptySlots() {
+    return state.fillOrder.filter((pos) => !state.roster[pos]);
   }
 
   function teamName(code) {
@@ -301,18 +395,190 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
     return t ? t.name : code;
   }
 
+  function logoUrl(code) {
+    const key = ESPN_LOGO[code] || String(code || "").toLowerCase();
+    return `https://a.espncdn.com/i/teamlogos/nfl/500/${key}.png`;
+  }
+
+  function logoHtml(code, cls) {
+    const c = code || "?";
+    return `<span class="logo-wrap ${cls || ""}" data-code="${c}">
+      <img class="team-logo" src="${logoUrl(c)}" alt="${c}" loading="lazy"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'"/>
+      <span class="logo-fallback" style="display:none">${c}</span>
+    </span>`;
+  }
+
+  function hashStr(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  function seeded(seed) {
+    let x = seed || 1;
+    return () => {
+      x ^= x << 13; x >>>= 0;
+      x ^= x >> 17; x >>>= 0;
+      x ^= x << 5; x >>>= 0;
+      return (x >>> 0) / 4294967296;
+    };
+  }
+
+  function jerseyFor(player, pos) {
+    if (player.jersey != null) return player.jersey;
+    if (player.number != null) return player.number;
+    if (KNOWN_JERSEY[player.name] != null) return KNOWN_JERSEY[player.name];
+    if (player.generated) {
+      const h = hashStr(player.name + "|" + (player.season || ""));
+      const ranges = {
+        QB: [1, 19], RB: [20, 39], WR: [10, 19], TE: [80, 89],
+        OT: [70, 79], OG: [60, 79], C: [50, 79],
+        DE: [90, 99], DT: [90, 99], LB: [50, 59],
+        CB: [20, 29], S: [20, 49], K: [1, 9], P: [1, 9], RET: [10, 39],
+      };
+      let kind = "WR";
+      if (/^QB/.test(pos)) kind = "QB";
+      else if (/^RB/.test(pos)) kind = "RB";
+      else if (/^WR/.test(pos)) kind = "WR";
+      else if (pos === "TE") kind = "TE";
+      else if (pos === "LT" || pos === "RT") kind = "OT";
+      else if (pos === "LG" || pos === "RG") kind = "OG";
+      else if (pos === "C") kind = "C";
+      else if (pos.includes("DE")) kind = "DE";
+      else if (pos.includes("DT")) kind = "DT";
+      else if (pos.includes("LB")) kind = "LB";
+      else if (pos.includes("CB")) kind = "CB";
+      else if (pos === "SS" || pos === "FS") kind = "S";
+      else if (pos === "K") kind = "K";
+      else if (pos === "P") kind = "P";
+      else if (pos === "RET") kind = "RET";
+      const [a, b] = ranges[kind] || [1, 99];
+      return a + (h % (b - a + 1));
+    }
+    const h = hashStr(player.name);
+    return 1 + (h % 99);
+  }
+
+  function photoFor(player) {
+    if (player.photo) return player.photo;
+    if (player.img) return player.img;
+    if (!player.generated && KNOWN_PHOTO[player.name]) return KNOWN_PHOTO[player.name];
+    return null;
+  }
+
+  function formatJersey(n) {
+    if (n === 0) return "00";
+    return String(n);
+  }
+
+  function avatarHtml(player, pos, sizeClass) {
+    const num = jerseyFor(player, pos);
+    const photo = photoFor(player);
+    const monogram = formatJersey(num);
+    const tier = (player.tier || "Starter").toLowerCase();
+    if (photo) {
+      return `<span class="avatar ${sizeClass || ""} tier-${tier}">
+        <img src="${photo}" alt="" loading="lazy"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <span class="avatar-fallback" style="display:none">#${monogram}</span>
+      </span>`;
+    }
+    return `<span class="avatar ${sizeClass || ""} tier-${tier} placeholder"><span class="avatar-fallback" style="display:flex">#${monogram}</span></span>`;
+  }
+
+  function synthesizeStats(player, pos) {
+    if (player.stats) {
+      return typeof player.stats === "string" ? player.stats : Object.entries(player.stats).map(([k, v]) => `${v} ${k}`).join(" · ");
+    }
+    const r = player.rating || 75;
+    const rnd = seeded(hashStr(player.name + "|" + player.season + "|" + pos));
+    const n = (lo, hi) => Math.round(lo + rnd() * (hi - lo));
+    const scale = (r - 70) / 30; // 0..1-ish
+
+    if (/^QB/.test(pos)) {
+      const yds = n(2800 + scale * 1200, 3200 + scale * 2300);
+      const td = n(16 + scale * 14, 22 + scale * 28);
+      const ints = Math.max(4, n(18 - scale * 10, 22 - scale * 12));
+      return `${yds.toLocaleString()} yds · ${td} TD · ${ints} INT`;
+    }
+    if (/^RB/.test(pos)) {
+      const yds = n(700 + scale * 400, 900 + scale * 900);
+      const td = n(4 + scale * 4, 8 + scale * 12);
+      return `${yds.toLocaleString()} rush · ${td} TD`;
+    }
+    if (/^WR/.test(pos) || pos === "TE") {
+      const rec = n(40 + scale * 30, 55 + scale * 70);
+      const yds = n(550 + scale * 400, 750 + scale * 1100);
+      const td = n(3 + scale * 4, 6 + scale * 14);
+      return `${rec} rec · ${yds.toLocaleString()} yds · ${td} TD`;
+    }
+    if (pos === "LT" || pos === "RT" || pos === "LG" || pos === "RG" || pos === "C") {
+      const sn = n(85 + scale * 8, 92 + scale * 8);
+      const pens = Math.max(1, n(8 - scale * 5, 10 - scale * 4));
+      return `${sn}% snaps · ${pens} flags`;
+    }
+    if (pos.includes("DE") || pos.includes("DT")) {
+      const sack = (n(30 + scale * 60, 50 + scale * 100) / 10).toFixed(1);
+      const tfl = n(6 + scale * 6, 10 + scale * 12);
+      return `${sack} sack · ${tfl} TFL`;
+    }
+    if (pos.includes("LB")) {
+      const tkl = n(70 + scale * 40, 90 + scale * 70);
+      const sack = (n(10 + scale * 40, 20 + scale * 60) / 10).toFixed(1);
+      const ints = n(0 + scale * 2, 1 + scale * 4);
+      return `${tkl} tkl · ${sack} sack · ${ints} INT`;
+    }
+    if (pos.includes("CB") || pos === "SS" || pos === "FS") {
+      const tkl = n(40 + scale * 20, 55 + scale * 35);
+      const ints = n(1 + scale * 2, 3 + scale * 6);
+      const pd = n(6 + scale * 4, 10 + scale * 10);
+      return `${tkl} tkl · ${ints} INT · ${pd} PD`;
+    }
+    if (pos === "K") {
+      const made = n(20 + scale * 8, 26 + scale * 12);
+      const att = made + n(1, 5 - Math.floor(scale * 3));
+      const xp = n(28 + scale * 10, 35 + scale * 20);
+      return `${made}/${att} FG · ${xp} XP`;
+    }
+    if (pos === "P") {
+      const avg = (42 + scale * 6 + rnd() * 2).toFixed(1);
+      const in20 = n(20 + scale * 8, 28 + scale * 12);
+      return `${avg} avg · ${in20} In20`;
+    }
+    if (pos === "RET") {
+      const kr = n(18 + scale * 6, 24 + scale * 10);
+      const pr = n(7 + scale * 3, 10 + scale * 6);
+      const td = n(0 + scale * 1, 1 + scale * 3);
+      return `${kr} KR avg · ${pr} PR · ${td} TD`;
+    }
+    return `${r} OVR · peak ${player.season}`;
+  }
+
+  function enrichPlayer(p, pos, team) {
+    const out = { ...p };
+    out.jersey = jerseyFor(out, pos);
+    out.stats = synthesizeStats(out, pos);
+    const photo = photoFor(out);
+    if (photo) out.photo = photo;
+    out.fromTeam = team || state.team;
+    return out;
+  }
+
   function getChoices(team, decade, pos) {
     const key = `${team}|${decade}|${pos}`;
     const list = D().rosterDB[key];
     if (!list || list.length < 3) {
-      // Should never happen, but hard-fail safe
       return [
-        { name: "Emergency Starter A", season: decade.slice(0, 4), rating: 72, tier: "Starter", blurb: "Depth chart fill" },
-        { name: "Emergency Starter B", season: decade.slice(0, 4), rating: 71, tier: "Starter", blurb: "Depth chart fill" },
-        { name: "Emergency Starter C", season: decade.slice(0, 4), rating: 70, tier: "Starter", blurb: "Depth chart fill" },
+        enrichPlayer({ name: "Emergency Starter A", season: decade.slice(0, 4), rating: 72, tier: "Starter", blurb: "Depth chart fill", generated: true }, pos, team),
+        enrichPlayer({ name: "Emergency Starter B", season: decade.slice(0, 4), rating: 71, tier: "Starter", blurb: "Depth chart fill", generated: true }, pos, team),
+        enrichPlayer({ name: "Emergency Starter C", season: decade.slice(0, 4), rating: 70, tier: "Starter", blurb: "Depth chart fill", generated: true }, pos, team),
       ];
     }
-    return list.map((p) => ({ ...p }));
+    return list.map((p) => enrichPlayer(p, pos, team));
   }
 
   function randInt(a, b) {
@@ -326,55 +592,117 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
   function initSelects() {
     const decadeSel = el("decadeSelect");
     const teamSel = el("teamSelect");
+    if (!decadeSel || !teamSel) return;
     decadeSel.innerHTML = D().decades.map((d) => `<option value="${d}">${d}</option>`).join("");
     teamSel.innerHTML = D().teams.map((t) => `<option value="${t.code}">${t.code} — ${t.name}</option>`).join("");
     decadeSel.value = state.decade;
     teamSel.value = state.team;
-    decadeSel.onchange = () => { state.decade = decadeSel.value; };
-    teamSel.onchange = () => { state.team = teamSel.value; };
+    decadeSel.onchange = () => { state.decade = decadeSel.value; updateTeamLogo(); };
+    teamSel.onchange = () => { state.team = teamSel.value; updateTeamLogo(); };
+    updateTeamLogo();
+  }
+
+  function updateTeamLogo() {
+    const box = el("teamLogoBox");
+    if (!box) return;
+    box.innerHTML = logoHtml(state.team, "logo-lg") + `<span class="team-logo-label">${teamName(state.team)}</span>`;
   }
 
   function setView(view) {
     state.view = view;
+    const start = el("view-start");
+    if (start) start.classList.toggle("hidden", view !== "start");
     ["build", "season", "playoffs"].forEach((v) => {
-      el(`view-${v}`).classList.toggle("hidden", v !== view);
+      const node = el(`view-${v}`);
+      if (node) node.classList.toggle("hidden", v !== view);
       const tab = el(`tab-${v}`);
-      tab.classList.toggle("active", v === view);
+      if (tab) tab.classList.toggle("active", v === view);
     });
+    const tabs = el("mainTabs");
+    if (tabs) tabs.classList.toggle("hidden", view === "start" || !state.started);
     render();
   }
 
   function updateTabs() {
-    el("tab-season").disabled = !rosterFull();
-    el("tab-playoffs").disabled = !state.undefeated;
+    const ts = el("tab-season");
+    const tp = el("tab-playoffs");
+    if (ts) ts.disabled = !rosterFull();
+    if (tp) tp.disabled = !state.undefeated;
+  }
+
+  function canAffordRespin() {
+    return state.infiniteRespins || state.respinsLeft > 0;
+  }
+
+  function consumeRespinIfNeeded() {
+    // First reveal for a newly selected slot is free
+    if (!state.slotHasReveal) {
+      state.slotHasReveal = true;
+      return true;
+    }
+    if (state.infiniteRespins) return true;
+    if (state.respinsLeft <= 0) return false;
+    state.respinsLeft -= 1;
+    return true;
+  }
+
+  function renderRespinMeter() {
+    const box = el("respinMeter");
+    if (!box) return;
+    if (state.infiniteRespins) {
+      box.innerHTML = `<span class="respin-pill infinite">Respins: ∞</span>`;
+      return;
+    }
+    const n = state.respinsLeft;
+    box.innerHTML = `<span class="respin-pill ${n === 0 ? "empty" : ""}">Respins left: <strong>${n}</strong></span>`;
   }
 
   function renderSlotBanner() {
-    const slot = currentSlot();
-    const filled = state.nextIndex;
+    const slot = state.selectedSlot;
+    const filled = Object.keys(state.roster).length;
     const total = state.fillOrder.length;
     const pct = Math.round((filled / total) * 100);
-    el("slotBanner").innerHTML = slot
-      ? `<div>Filling roster slot <strong>${slot}</strong> (${filled + 1} of ${total})</div>
-         <div class="hint" style="margin:6px 0 0">Spin a decade + team. You get the top 3 at this position for that franchise in that decade — ranked by each player's <em>best season</em> while there.</div>
-         <div class="progress"><span style="width:${pct}%"></span></div>`
-      : `<div><strong>Roster locked in!</strong> Power rating: ${rosterPower()}. Hit Season and chase 17-0.</div>
-         <div class="progress"><span style="width:100%"></span></div>`;
+    const banner = el("slotBanner");
+    if (!banner) return;
+    if (rosterFull()) {
+      banner.innerHTML = `<div><strong>Roster locked!</strong> Power ${rosterPower()} — run the season.</div>
+        <div class="progress"><span style="width:100%"></span></div>`;
+      return;
+    }
+    if (!slot) {
+      banner.innerHTML = `<div>Tap an <strong>empty depth-chart slot</strong> to fill it.</div>
+        <div class="progress"><span style="width:${pct}%"></span></div>`;
+      return;
+    }
+    banner.innerHTML = `<div>Selected: <strong>${slot}</strong> · ${filled}/${total} filled ${logoHtml(state.team, "logo-sm")}</div>
+      <div class="progress"><span style="width:${pct}%"></span></div>`;
   }
 
   function renderChoices() {
     const box = el("choices");
+    if (!box) return;
+    if (!state.selectedSlot) {
+      box.innerHTML = `<p class="hint slim">Select an empty slot on the depth chart.</p>`;
+      return;
+    }
     if (!state.choices) {
-      box.innerHTML = `<p class="hint">Hit <strong>SPIN</strong> for random decade + team, or set the dials and press <strong>Reveal Top 3</strong>.</p>`;
+      box.innerHTML = `<p class="hint slim">SPIN or Reveal Top 3 for <strong>${state.selectedSlot}</strong>.</p>`;
       return;
     }
     box.innerHTML = state.choices
       .map(
         (p, i) => `
       <button class="card" data-idx="${i}" type="button">
-        <span class="badge ${p.tier.toLowerCase()}">${p.tier}</span>
-        <div class="name">${p.name}</div>
-        <div class="meta">Best season: ${p.season} · ${teamName(state.team)} · ${state.decade}</div>
+        <div class="card-top">
+          ${avatarHtml(p, state.selectedSlot, "avatar-md")}
+          <div class="card-head">
+            <span class="badge ${p.tier.toLowerCase()}">${p.tier}</span>
+            ${logoHtml(p.fromTeam || state.team, "logo-sm")}
+          </div>
+        </div>
+        <div class="name">${p.name} <span class="jersey">#${formatJersey(p.jersey)}</span></div>
+        <div class="stats">${p.stats || ""}</div>
+        <div class="meta">${p.season} · ${teamName(p.fromTeam || state.team)} · ${state.decade}</div>
         <div class="rating">${p.rating}</div>
         <div class="blurb">${p.blurb || ""}</div>
       </button>`
@@ -391,54 +719,97 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
       ["Defense", D().defense],
       ["Special Teams", D().special],
     ];
-    el("rosterGrid").innerHTML = groups
+    const grid = el("rosterGrid");
+    if (!grid) return;
+    grid.innerHTML = groups
       .map(([label, positions]) => {
         const cells = positions
           .map((pos) => {
             const pl = state.roster[pos];
             if (!pl) {
-              return `<div class="roster-slot empty"><div class="pos">${pos}</div><div class="pname">—</div></div>`;
+              const selected = state.selectedSlot === pos ? " selected" : "";
+              return `<button type="button" class="roster-slot empty selectable${selected}" data-pos="${pos}">
+                <div class="pos">${pos}</div><div class="pname">Tap to fill</div>
+              </button>`;
             }
-            return `<div class="roster-slot"><div class="pos">${pos} · ${pl.tier}</div><div class="pname">${pl.name}</div><div class="prating">${pl.rating} · '${String(pl.season).slice(-2)}</div></div>`;
+            return `<div class="roster-slot filled" data-pos="${pos}">
+              <div class="slot-row">
+                ${avatarHtml(pl, pos, "avatar-xs")}
+                ${logoHtml(pl.fromTeam || "", "logo-xs")}
+                <div class="pos">${pos} · ${pl.tier}</div>
+              </div>
+              <div class="pname">${pl.name} <span class="jersey">#${formatJersey(pl.jersey)}</span></div>
+              <div class="prating">${pl.rating} · '${String(pl.season).slice(-2)}</div>
+              <div class="slot-stats">${pl.stats || ""}</div>
+            </div>`;
           })
           .join("");
         return `<div class="section-label">${label}</div><div class="roster-grid">${cells}</div>`;
       })
       .join("");
-    el("powerBar").innerHTML = `<div>Roster power: <strong style="color:var(--green)">${rosterPower()}</strong></div>
-      <div class="hint" style="margin:0">${Object.keys(state.roster).length} / ${state.fillOrder.length} slots</div>`;
+
+    grid.querySelectorAll(".roster-slot.selectable").forEach((btn) => {
+      btn.onclick = () => selectSlot(btn.dataset.pos);
+    });
+
+    const power = el("powerBar");
+    if (power) {
+      power.innerHTML = `<div>Power <strong style="color:var(--green)">${rosterPower()}</strong></div>
+        <div class="hint" style="margin:0">${Object.keys(state.roster).length}/${state.fillOrder.length}</div>`;
+    }
+  }
+
+  function selectSlot(pos) {
+    if (state.roster[pos]) return;
+    if (state.selectedSlot === pos) return;
+    state.selectedSlot = pos;
+    state.choices = null;
+    state.slotHasReveal = false; // first reveal on this slot is free
+    render();
   }
 
   function spinDials() {
-    if (rosterFull()) return;
+    if (rosterFull() || !state.selectedSlot) return;
+    if (state.slotHasReveal && !canAffordRespin()) return;
     state.decade = pickRandom(D().decades);
     state.team = pickRandom(D().teams).code;
     el("decadeSelect").value = state.decade;
     el("teamSelect").value = state.team;
+    updateTeamLogo();
     revealChoices(true);
   }
 
   function revealChoices(animated) {
-    if (rosterFull()) return;
-    const slot = currentSlot();
+    if (rosterFull() || !state.selectedSlot) return;
+    if (state.slotHasReveal && !canAffordRespin()) {
+      render();
+      return;
+    }
+    if (!consumeRespinIfNeeded()) {
+      render();
+      return;
+    }
+    const slot = state.selectedSlot;
     const btn = el("btnReveal");
-    if (animated) {
-      btn.classList.add("spinning");
-      el("choices").innerHTML = `<p class="hint spinning">Searching ${teamName(state.team)} ${state.decade} depth chart for ${slot}… ranking by best season…</p>`;
-      setTimeout(() => {
-        btn.classList.remove("spinning");
-        state.choices = getChoices(state.team, state.decade, slot);
-        renderChoices();
-      }, 450);
-    } else {
+    const doReveal = () => {
       state.choices = getChoices(state.team, state.decade, slot);
-      renderChoices();
+      render();
+    };
+    if (animated) {
+      if (btn) btn.classList.add("spinning");
+      el("choices").innerHTML = `<p class="hint spinning">${logoHtml(state.team, "logo-sm")} ${teamName(state.team)} ${state.decade} · ${slot}…</p>`;
+      setTimeout(() => {
+        if (btn) btn.classList.remove("spinning");
+        doReveal();
+      }, 400);
+    } else {
+      doReveal();
     }
   }
 
   function pickPlayer(idx) {
-    if (!state.choices || rosterFull()) return;
-    const slot = currentSlot();
+    if (!state.choices || !state.selectedSlot || rosterFull()) return;
+    const slot = state.selectedSlot;
     const player = state.choices[idx];
     state.roster[slot] = {
       ...player,
@@ -446,8 +817,9 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
       fromDecade: state.decade,
       slot,
     };
-    state.nextIndex += 1;
     state.choices = null;
+    state.selectedSlot = null;
+    state.slotHasReveal = false;
     if (rosterFull()) {
       updateTabs();
       el("buildComplete").classList.remove("hidden");
@@ -455,22 +827,46 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
     render();
   }
 
-  function resetRoster() {
+  function showStartScreen() {
+    state.started = false;
     state.roster = {};
-    state.nextIndex = 0;
+    state.selectedSlot = null;
+    state.slotHasReveal = false;
     state.choices = null;
     state.season = null;
     state.undefeated = false;
     state.playoff = null;
-    el("buildComplete").classList.add("hidden");
+    state.respinsLeft = DEFAULT_RESPINS;
+    const chk = el("infiniteRespins");
+    if (chk) chk.checked = state.infiniteRespins;
+    el("buildComplete") && el("buildComplete").classList.add("hidden");
+    updateTabs();
+    setView("start");
+  }
+
+  function startGame() {
+    const chk = el("infiniteRespins");
+    state.infiniteRespins = !!(chk && chk.checked);
+    state.started = true;
+    state.roster = {};
+    state.selectedSlot = null;
+    state.slotHasReveal = false;
+    state.choices = null;
+    state.season = null;
+    state.undefeated = false;
+    state.playoff = null;
+    state.respinsLeft = DEFAULT_RESPINS;
+    el("buildComplete") && el("buildComplete").classList.add("hidden");
     updateTabs();
     setView("build");
   }
 
+  function resetRoster() {
+    showStartScreen();
+  }
+
   // —— Season ——
   function opponentPower(week) {
-    // Fixed schedule with spicy variance. Solid ~2050 teams win 10-13;
-    // true Legend stacks (~2150-2250) can hunt 17-0 without it being free.
     const base = 1960 + week * 4;
     return base + randInt(-150, 170);
   }
@@ -486,13 +882,7 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
       const win = yours >= opp;
       if (win) w++; else l++;
       const names = ["Rivalry Rematch","Prime-Time Trap","Road Grind","Home Crowd Roar","Division Dust-Up","Statement Game","Weather War","Revenge Tour","Must-Win Energy","Flex Fight"];
-      weeks.push({
-        week,
-        win,
-        yours,
-        opp,
-        label: pickRandom(names),
-      });
+      weeks.push({ week, win, yours, opp, label: pickRandom(names) });
     }
     state.season = { weeks, record: { w, l }, power };
     state.undefeated = w === 17;
@@ -580,16 +970,13 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
     const pf = state.playoff;
     if (!pf || !pf.choices || pf.playerPick) return;
     pf.playerPick = pf.choices[idx];
-    // CPU: random decade + one of top 5
     const cpuDecade = pickRandom(D().decades);
     const meta = ROUND_META[pf.roundIndex];
     const cpuPool = D()[meta.bucket][cpuDecade];
     pf.cpuPick = { ...pickRandom(cpuPool), decade: cpuDecade };
     pf.playerPick.decade = pf.decade;
     const win = pf.playerPick.rating >= pf.cpuPick.rating;
-    // slight randomness tie-break if equal already handled by >=
     if (pf.playerPick.rating === pf.cpuPick.rating) {
-      // coin flip feel
       pf.lastResult = Math.random() < 0.5 ? "win" : "loss";
     } else {
       pf.lastResult = win ? "win" : "loss";
@@ -639,18 +1026,18 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
     }
     const meta = ROUND_META[pf.roundIndex];
     let html = `
-      <div class="slot-banner">
+      <div class="slot-banner compact">
         <div><strong>${meta.title}</strong> — Round ${pf.roundIndex + 1} of 3</div>
-        <div class="hint" style="margin:6px 0 0">${meta.blurb} Higher rating wins the duel.</div>
+        <div class="hint slim" style="margin:6px 0 0">${meta.blurb} Higher rating wins.</div>
       </div>
-      <div class="dials">
+      <div class="dials compact-dials">
         <div class="dial">
-          <label>Decade dial</label>
+          <label>Decade</label>
           <select id="poDecade">${D().decades.map((d) => `<option value="${d}" ${d === pf.decade ? "selected" : ""}>${d}</option>`).join("")}</select>
         </div>
         <div class="dial">
           <label>Category</label>
-          <div style="padding:12px;font-weight:800">${meta.label}s — Top 5</div>
+          <div style="padding:10px;font-weight:800">${meta.label}s — Top 5</div>
         </div>
       </div>
       <div class="actions">
@@ -659,7 +1046,7 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
       </div>`;
 
     if (pf.choices && !pf.playerPick) {
-      html += `<div class="hint">Pick your ${meta.label}. CPU will roll a random decade + one of its top 5.</div>
+      html += `<div class="hint slim">Pick your ${meta.label}.</div>
         <div class="choices" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
         ${pf.choices
           .map(
@@ -701,21 +1088,15 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
             youWin
               ? `<button class="btn btn-success" id="btnPoNext">${pf.roundIndex >= 2 ? "Raise the Trophy" : "Next Round"}</button>`
               : `<button class="btn btn-secondary" id="btnPoRetry">Retry Playoffs</button>
-                 <button class="btn btn-danger" id="btnPoRebuild">Rebuild Roster</button>`
+                 <button class="btn btn-danger" id="btnPoRebuild">New Game</button>`
           }
         </div>`;
-    }
-
-    if (showGameOver && pf.lastResult === "loss") {
-      // already handled above
     }
 
     root.innerHTML = html;
     const poDec = el("poDecade");
     if (poDec && !pf.playerPick) {
-      poDec.onchange = () => {
-        pf.decade = poDec.value;
-      };
+      poDec.onchange = () => { pf.decade = poDec.value; };
     }
     const spin = el("btnPoSpin");
     if (spin) spin.onclick = spinPlayoffDecade;
@@ -732,15 +1113,25 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
     if (reb) reb.onclick = resetRoster;
   }
 
+  function updateSpinButtons() {
+    const noSlot = !state.selectedSlot || rosterFull();
+    const blocked = state.slotHasReveal && !canAffordRespin();
+    const dis = noSlot || blocked;
+    if (el("btnSpin")) el("btnSpin").disabled = dis;
+    if (el("btnReveal")) el("btnReveal").disabled = dis;
+    if (el("btnSimSeason")) el("btnSimSeason").classList.toggle("hidden", !rosterFull());
+  }
+
   function render() {
     updateTabs();
+    if (state.view === "start") return;
     if (state.view === "build") {
       renderSlotBanner();
+      renderRespinMeter();
       renderChoices();
       renderRoster();
-      el("btnSpin").disabled = rosterFull();
-      el("btnReveal").disabled = rosterFull();
-      el("btnSimSeason").classList.toggle("hidden", !rosterFull());
+      updateTeamLogo();
+      updateSpinButtons();
     } else if (state.view === "season") {
       if (!state.season) {
         el("weekList").innerHTML = "";
@@ -754,6 +1145,7 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
   }
 
   function bind() {
+    el("btnStartGame").onclick = startGame;
     el("tab-build").onclick = () => setView("build");
     el("tab-season").onclick = () => {
       if (!rosterFull()) return;
@@ -771,6 +1163,7 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
     el("btnRebuild").onclick = resetRoster;
     el("btnPlayoffs").onclick = startPlayoffs;
     el("btnStartSeason").onclick = simulateSeason;
+    if (el("btnNewGame")) el("btnNewGame").onclick = resetRoster;
   }
 
   function boot() {
@@ -779,9 +1172,17 @@ window.NFL_DATA = {"decades":["1960s","1970s","1980s","1990s","2000s","2010s","2
       return;
     }
     state.fillOrder = fillOrder();
+    // Ensure team logo box exists near dials
+    const dials = document.querySelector(".compact-dials") || document.querySelector(".dials");
+    if (dials && !el("teamLogoBox")) {
+      const box = document.createElement("div");
+      box.id = "teamLogoBox";
+      box.className = "team-logo-box";
+      dials.parentNode.insertBefore(box, dials);
+    }
     initSelects();
     bind();
-    render();
+    setView("start");
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
