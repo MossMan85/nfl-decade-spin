@@ -154,6 +154,7 @@ button, select { font: inherit; }
 .card .meta { color: var(--muted); font-size: .78rem; }
 .card .rating { font-size: 1.45rem; font-weight: 900; color: var(--green); margin-top: 6px; }
 .card .blurb { font-size: .78rem; color: #b7c6e0; margin-top: 4px; line-height:1.3; }
+.card .card-cta { color: var(--gold); font-size: .72rem; font-weight: 800; margin-top: 8px; letter-spacing: .04em; text-transform: uppercase; }
 .avatar {
   display:inline-flex; align-items:center; justify-content:center; border-radius: 50%;
   overflow: hidden; background: #0f1728; border: 2px solid var(--line); flex-shrink: 0;
@@ -165,6 +166,7 @@ button, select { font: inherit; }
 }
 .avatar.tier-legend { border-color: rgba(245,197,66,.7); }
 .avatar.tier-star { border-color: rgba(77,163,255,.6); }
+.avatar-lg { width: 72px; height: 72px; font-size: 1rem; }
 .avatar-md { width: 52px; height: 52px; font-size: .85rem; }
 .avatar-xs { width: 28px; height: 28px; font-size: .6rem; }
 .spinning { animation: pulse 0.5s ease infinite alternate; }
@@ -185,8 +187,11 @@ button, select { font: inherit; }
   background: linear-gradient(180deg, #2a3d62, #1a2740);
 }
 .roster-slot.filled {
-  opacity: .48; filter: grayscale(.45); pointer-events: none; cursor: default;
+  opacity: .72; filter: grayscale(.2); cursor: pointer;
   background: #0b1220; border-color: #243044;
+}
+.roster-slot.filled:hover, .roster-slot.filled:focus {
+  opacity: 1; filter: none; border-color: var(--gold); outline: none;
 }
 .roster-slot .pos { font-size:.68rem; color:var(--muted); font-weight:800; letter-spacing:.05em; }
 .roster-slot .pname { font-weight:700; font-size:.86rem; margin-top:2px; }
@@ -230,7 +235,30 @@ button, select { font: inherit; }
   height: 6px; background:#0f1728; border-radius:999px; overflow:hidden; margin: 6px 0 0;
 }
 .progress > span { display:block; height:100%; background: linear-gradient(90deg, var(--gold), var(--green)); width:0%; transition: width .3s ease; }
-.footer-note { color:#7f92b3; font-size:.75rem; text-align:center; margin-top: 6px; }
+.sheet-backdrop {
+  position: fixed; inset: 0; background: rgba(4,8,16,.62);
+  z-index: 40; display: flex; align-items: flex-end; justify-content: center;
+}
+.sheet {
+  width: min(560px, 100%); max-height: 88vh; overflow: auto;
+  background: linear-gradient(180deg, #1d2b45, #121a2c);
+  border: 1px solid var(--line); border-radius: 20px 20px 0 0;
+  box-shadow: var(--shadow); padding: 16px 16px 20px; color: var(--text);
+}
+.sheet-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.sheet-x {
+  appearance:none; border:1px solid var(--line); background:#243552; color:var(--text);
+  width:40px; height:40px; border-radius:50%; font-weight:800; cursor:pointer; flex-shrink:0;
+}
+.sheet-hero { display:flex; gap:12px; align-items:center; margin: 10px 0 8px; }
+.sheet .name { font-size:1.35rem; font-weight:800; margin:0 0 4px; }
+.sheet .bio { color:#c5d3ea; font-size:.92rem; line-height:1.45; margin: 10px 0 14px; }
+.sheet .meta, .sheet .stats { margin: 2px 0; }
+.sheet-actions { display:flex; gap:8px; }
+@media (min-width: 720px) {
+  .sheet-backdrop { align-items: center; }
+  .sheet { border-radius: 18px; }
+}
 @media (max-width: 560px) {
   body { padding: 8px; padding-bottom: 28px; }
   .hero.compact { padding: 10px 12px; margin-bottom: 8px; }
@@ -251,6 +279,7 @@ button, select { font: inherit; }
 </style>
 </head>
 <body>
+  <div id="playerSheet" class="sheet-backdrop hidden" hidden></div>
   <div class="wrap">
     <header class="hero compact">
       <h1>NFL Decade Spin</h1>
@@ -261,7 +290,7 @@ button, select { font: inherit; }
     <section id="view-start">
       <div class="panel start-panel">
         <h2>New Game</h2>
-        <p class="hint">Tap a slot, hit SPIN, pick one of the top 3. First spin per slot is free.</p>
+        <p class="hint">Tap a slot, hit SPIN, tap a player to inspect, then Draft. First spin per slot is free.</p>
         <label class="toggle-row" for="infiniteRespins">
           <span>
             <strong>Infinite respins</strong>
@@ -522,6 +551,520 @@ button, select { font: inherit; }
     return list.map((p) => enrichPlayer(p, pos, team));
   }
 
+  const KNOWN_BIO = {
+    "Tom Brady": "Six-time Super Bowl champion with New England and a seventh title in Tampa Bay. The 2007 regular season produced 4,806 yards and 50 touchdowns. Widely regarded as the greatest quarterback of the modern era.",
+    "Walter Payton": "Chicago Bears Hall of Famer nicknamed Sweetness. His 1977 masterpiece (1,852 rush yards, 14 TDs) set the then-NFL single-game rushing record along the way. Retired as the league's all-time leading rusher.",
+    "Jerry Rice": "San Francisco 49ers wide receiver and the NFL's all-time leader in catches, yards, and receiving TDs. The 1987 and 1995 seasons are two of the most productive receiver years ever recorded.",
+    "Joe Montana": "Four-time Super Bowl champion quarterback for the 49ers. Cool in the biggest moments — including Super Bowl XXIII and a 1989 season with a 112.4 passer rating.",
+    "Joe Namath": "Jets icon who guaranteed and delivered Super Bowl III. In 1967 he became the first pro quarterback to throw for 4,000 yards in a season.",
+    "Jim Brown": "Cleveland Browns fullback who led the NFL in rushing in eight of nine seasons. Retired in his prime after the 1965 season as the league's dominant runner.",
+    "Barry Sanders": "Detroit Lions Hall of Famer with eight straight 1,000-yard seasons. In 1997 he rushed for 2,053 yards and then walked away at the peak of his powers.",
+    "Emmitt Smith": "Cowboys workhorse and the NFL's all-time rushing leader. The 1995 season (1,773 yards, 25 TDs) powered Dallas's third Super Bowl of the 1990s.",
+    "Lawrence Taylor": "Giants pass rusher who changed how offenses protected the quarterback. Won league MVP in 1986 with 20.5 sacks and two Super Bowl rings.",
+    "Ray Lewis": "Heart of the Ravens defense and Super Bowl XXXV MVP. A two-time Defensive Player of the Year who defined Baltimore football for 17 seasons.",
+    "Peyton Manning": "Colts and Broncos quarterback with five MVPs. The 2004 Colts season (49 TDs) and 2013 Broncos season (55 TDs) sit among the greatest passing years ever.",
+    "Patrick Mahomes": "Chiefs quarterback and Super Bowl MVP who remade the position with improvisation and arm talent. His 2018 breakout: 5,097 yards and 50 touchdowns.",
+    "Aaron Rodgers": "Packers MVP quarterback with a record 122.5 passer rating in 2011. Super Bowl XLV champion and one of the most efficient passers in league history.",
+    "Dan Marino": "Dolphins gunslinger who threw for 5,084 yards and 48 TDs in 1984, shattering records as a second-year starter. Never won a Super Bowl but defined the passing explosion of the 1980s.",
+    "John Elway": "Broncos Hall of Famer famous for fourth-quarter comebacks. Closed his career with back-to-back Super Bowl titles in 1997 and 1998.",
+    "Brett Favre": "Ironman Packers quarterback and three-time MVP. Led Green Bay to Super Bowl XXXI and later had a late-career renaissance in Minnesota.",
+    "Steve Young": "Left-handed 49ers quarterback who succeeded Montana and won Super Bowl XXIX MVP. The 1994 season (35 TDs, league MVP) is his signature.",
+    "Drew Brees": "Saints quarterback who returned New Orleans to a championship in Super Bowl XLIV. Held the career passing-yardage record after multiple 5,000-yard seasons.",
+    "LaDainian Tomlinson": "Chargers running back who scored 31 touchdowns in 2006 and won league MVP. A dual-threat back who also piled up receiving production.",
+    "Marshall Faulk": "Engine of the Greatest Show on Turf. In 1999 he became one of the few backs with 1,000 rush and 1,000 receiving yards in the same season.",
+    "Terrell Davis": "Broncos Super Bowl XXXII MVP who rushed for 2,008 yards and 21 TDs in 1998. Injuries shortened a Hall of Fame peak.",
+    "Earl Campbell": "Houston Oilers freight train and 1979 NFL MVP. The 1980 season (1,934 rush yards) is the picture of power running.",
+    "Eric Dickerson": "Set the NFL single-season rushing record with 2,105 yards for the 1984 Rams. Later starred in Indianapolis after a blockbuster trade.",
+    "O.J. Simpson": "Bills running back who became the first to rush for 2,000 yards in a 14-game season (1973). Dominated the mid-1970s before a late stop in San Francisco.",
+    "Gale Sayers": "Bears rookie supernova in 1965 with 22 total touchdowns. Knee injuries cut short a Hall of Fame career that also included elite return work.",
+    "Deion Sanders": "Shutdown corner and return threat who won Super Bowls with the 49ers and Cowboys. Prime Time's 1994 49ers season earned Defensive Player of the Year.",
+    "Ronnie Lott": "49ers enforcer who won four Super Bowls at corner and safety. Known as much for physicality as for ball production.",
+    "Reggie White": "Minister of Defense, first as an Eagle and later as the pass-rush star of Super Bowl XXXI in Green Bay. Retired as the NFL's sack leader.",
+    "Bruce Smith": "Bills defensive end and the NFL's career sack leader. The 1990 season (19 sacks, DPOY) anchored Buffalo's Super Bowl runs.",
+    "Joe Greene": "Anchor of Pittsburgh's Steel Curtain and a two-time Defensive Player of the Year. Four Super Bowl titles in the 1970s.",
+    "Dick Butkus": "Bears middle linebacker whose reputation for violence and pursuit still defines the position. All-Pro through the late 1960s and early 1970s.",
+    "Mike Singletary": "Samurai middle linebacker of the 1985 Bears, a Super Bowl XX champion and two-time Defensive Player of the Year.",
+    "Jack Lambert": "Toothless symbol of the Steelers' 1970s defense. Defensive Player of the Year in 1976 and a four-time Super Bowl champion.",
+    "Junior Seau": "Chargers linebacker and the face of San Diego football in the 1990s. Later added veteran years in Miami and New England.",
+    "Derrick Thomas": "Chiefs pass rusher who recorded 7 sacks in a single 1990 game. A franchise icon whose career ended far too soon.",
+    "Anthony Munoz": "Cincinnati Bengals left tackle widely ranked among the greatest offensive linemen. Repeated first-team All-Pro through the 1980s.",
+    "John Hannah": "Patriots guard and a first-ballot Hall of Famer. The standard for interior maulers in the 1970s and 1980s.",
+    "Adam Vinatieri": "Clutch kicker of the Patriots dynasty and later a Colt. Ice-bowl kicks in Super Bowls XXXVI and XXXVIII are part of NFL lore.",
+    "Justin Tucker": "Ravens kicker and one of the most accurate in NFL history, including a record 66-yard field goal.",
+    "Ray Guy": "Raiders punter and the first punter elected to the Hall of Fame. A three-time Super Bowl champion.",
+    "Devin Hester": "Bears returner who scored a Super Bowl XLI kickoff touchdown and retired as the NFL's return-TD king.",
+    "Travis Kelce": "Chiefs tight end and a central piece of Kansas City's Super Bowl run. Peak receiving seasons in the 2010s and 2020s rewrote the position.",
+    "Rob Gronkowski": "Patriots tight end who combined size and speed on multiple Super Bowl teams, including a late title with Tampa Bay.",
+    "Tony Gonzalez": "Chiefs and Falcons tight end who retired as the receiving yardage king at the position. The 2004 Chiefs season (102-1,258-7) is a landmark year.",
+    "Randy Moss": "Deep-threat revolutionary with the Vikings and later a 23-TD season with the 2007 Patriots. A first-ballot Hall of Famer.",
+    "Calvin Johnson": "Megatron in Detroit. In 2012 he set the single-season receiving yardage record with 1,964.",
+    "Larry Fitzgerald": "Cardinals possession receiver whose 2008 postseason run nearly won Super Bowl XLIII. Retired among the all-time catch and yardage leaders.",
+    "Steve Largent": "Original Seahawks star and the receiving-yardage king of his era. Defined Seattle's offense in the 1970s and 1980s.",
+    "Art Monk": "Redskins possession receiver who set the career catch record and won Super Bowls in Washington's 1980s/1991 peak.",
+    "Tim Brown": "Raiders wideout and returner, a 1988 Heisman winner who piled up 1,000-yard seasons through the 1990s.",
+    "Cris Carter": "Vikings hands specialist who caught 122 passes in back-to-back mid-1990s seasons and later entered the Hall of Fame.",
+    "Michael Irvin": "The Playmaker of the Cowboys' 1990s dynasty. His 1995 season (111-1,603-10) came in a Super Bowl XXX year.",
+    "Thurman Thomas": "Bills all-purpose back who won Offensive Player of the Year in 1991 and fueled four straight Super Bowl trips.",
+    "Curtis Martin": "Patriots rookie smash in 1995 who later led the NFL in rushing with the Jets in 2004. Quiet Hall of Famer.",
+    "Edgerrin James": "Colts feature back who won rushing titles in 1999 and 2000 next to Peyton Manning, then later started for Arizona.",
+    "Adrian Peterson": "Vikings bruiser who rushed for 2,097 yards in 2012, one year after a major knee injury, and won league MVP.",
+    "Shaun Alexander": "Seahawks MVP in 2005 with 1,880 yards and 27 rushing TDs, then Super Bowl XL.",
+    "Priest Holmes": "Chiefs scoring machine in the early 2000s. The 2002–03 seasons produced 24 and 27 total touchdowns.",
+    "Marcus Allen": "Raiders Super Bowl XVIII MVP and 1985 league MVP. Later added productive veteran seasons in Kansas City.",
+    "Franco Harris": "Steelers Hall of Famer of the Immaculate Reception and four Super Bowl titles. The 1970s offense ran through him.",
+    "John Riggins": "Jets and Redskins back whose 1983 season (24 rush TDs) and Super Bowl XVII MVP run are Washington lore.",
+    "Roger Staubach": "Cowboys Captain America, a Navy veteran who won Super Bowls VI and XII and defined clutch quarterback play in the 1970s.",
+    "Terry Bradshaw": "Steelers quarterback of four Super Bowl titles. The 1978 MVP season sits at the heart of Pittsburgh's dynasty.",
+    "Bart Starr": "Packers championship quarterback of the 1960s and Super Bowl I and II MVP. Lombardi's closer.",
+    "Johnny Unitas": "Baltimore Colts icon who pioneered the modern passing game. Multiple-time MVP and a 1958 sudden-death title hero.",
+    "Fran Tarkenton": "Vikings scrambling pioneer and 1975 NFL MVP. Took Minnesota to three Super Bowls in the 1970s.",
+    "Dan Fouts": "Chargers Air Coryell quarterback. The 1981 season (4,802 yards, 33 TDs) is the signature of that offense.",
+    "Ken Stabler": "Raiders lefty and 1974 NFL MVP who won Super Bowl XI. The Snake's deep shots defined Oakland's 1970s teams.",
+    "Len Dawson": "Chiefs AFL star and Super Bowl IV MVP. The leading man of Kansas City's early championship years.",
+    "Warren Moon": "Oilers Run-and-Shoot quarterback who threw for 4,689 yards and 33 TDs in 1990 after a CFL Hall of Fame start.",
+    "Steve McNair": "Titans dual-threat quarterback, Super Bowl XXXIV runner-up, and 2003 co-MVP.",
+    "Kurt Warner": "Rams Super Bowl XXXIV MVP out of the Arena League, then a Cardinals Super Bowl run in 2008.",
+    "Lamar Jackson": "Ravens dual-threat MVP in 2019 and again in 2023. Changed how defenses have to play quarterback keepers.",
+    "Josh Allen": "Bills quarterback whose 2020 and 2024 peaks mixed huge passing numbers with designed runs and MVP-level play.",
+    "Joe Burrow": "Bengals quarterback who took Cincinnati to Super Bowl LVI in 2021 with 4,611 yards and 34 TDs.",
+    "Jalen Hurts": "Eagles quarterback of Super Bowl LVII, a dual-threat engine who piled up rushing touchdowns in 2022.",
+    "Justin Herbert": "Chargers passer who threw for 5,014 yards and 38 TDs in 2021, one of the most productive early-career seasons ever.",
+    "Aaron Donald": "Rams interior wrecking ball and three-time Defensive Player of the Year. Super Bowl LVI champion.",
+    "J.J. Watt": "Texans defensive end with three DPOY awards, including twin 20.5-sack seasons in 2012 and 2014.",
+    "T.J. Watt": "Steelers edge rusher who tied the modern sack record and won Defensive Player of the Year.",
+    "Von Miller": "Broncos Super Bowl 50 MVP and later a Super Bowl champion again with the Rams.",
+    "Ed Reed": "Ravens free safety and 2004 Defensive Player of the Year. Ball-hawking center fielder with a knack for return yards.",
+    "Troy Polamalu": "Steelers strong safety, two-time Super Bowl champion, and 2010 Defensive Player of the Year.",
+    "Richard Sherman": "Seahawks corner of the Legion of Boom and Super Bowl XLVIII. The 2013 season (8 INTs) is his signature.",
+    "Darrelle Revis": "Jets lockdown corner of Revis Island. Later won Super Bowl XLIX with New England.",
+    "Champ Bailey": "Redskins and Broncos corner, a 12-time Pro Bowler. The 2006 Broncos season (10 INTs) is a peak year.",
+    "Charles Woodson": "Raiders OROY who later won Defensive Player of the Year with the 2009 Packers and Super Bowl XLV.",
+    "Mel Blount": "Steelers bump-and-run corner whose physical style forced a rule change. Four Super Bowl rings.",
+    "Night Train Lane": "Interception artist with the Cardinals and Lions. Still owns the single-season INT record (14, 1952) and starred into the 1960s.",
+    "Paul Warfield": "Deep threat for the Browns and the perfect-season Dolphins. A Hall of Famer who stretched defenses vertically.",
+    "Lance Alworth": "Chargers AFL receiver nicknamed Bambi. The 1965 season (1,602 yards, 14 TDs) is an AFL landmark.",
+    "Don Maynard": "Jets deep threat and Joe Namath's favorite target, including Super Bowl III.",
+    "Kellen Winslow": "Chargers tight end who remade the position. The 1981 Epic in Miami game sits on top of 1,000-yard receiving seasons.",
+    "Mike Ditka": "Bears tight end whose 1961 rookie smash (1,076 yards, 12 TDs) announced a new kind of TE, later a Super Bowl XX coach.",
+    "John Mackey": "Colts tight end who ran through the secondary in the 1960s and helped win Super Bowl V.",
+    "Ozzie Newsome": "Browns tight end nicknamed the Wizard of Oz, later the Ravens' Hall of Fame general manager.",
+    "Shannon Sharpe": "Broncos and Ravens tight end, three-time Super Bowl champion, and a talkative Hall of Famer.",
+    "Antonio Gates": "Undrafted Chargers tight end out of basketball who became a first-ballot Hall of Fame scorer.",
+    "Jason Witten": "Cowboys tight end and a durability icon with 16 seasons of production in Dallas.",
+    "George Blanda": "Oilers and Raiders quarterback/kicker who played until age 48. The 1970 Raiders heroics are NFL folklore.",
+    "Jan Stenerud": "Chiefs soccer-style kicker and a Super Bowl IV champion. The first pure placekicker in the Hall of Fame.",
+    "Morten Andersen": "The Great Dane, a Saints and Falcons All-Pro who retired as the NFL's scoring leader.",
+    "Deacon Jones": "Rams Fearsome Foursome end who coined the word sack. Secretary of Defense in the 1960s.",
+    "Merlin Olsen": "Rams defensive tackle and broadcasting fixture, a 14-time Pro Bowler on the Fearsome Foursome.",
+    "Alan Page": "Vikings defensive tackle and the first defensive player to win league MVP (1971).",
+    "Carl Eller": "Purple People Eaters end who anchored Minnesota's 1960s–70s defenses.",
+    "Howie Long": "Raiders defensive end and Super Bowl XVIII champion, later a longtime studio analyst.",
+    "Michael Strahan": "Giants defensive end who set the single-season sack record (22.5) in 2001 and won Super Bowl XLII.",
+    "Jason Taylor": "Dolphins edge rusher and 2006 Defensive Player of the Year.",
+    "Derrick Brooks": "Buccaneers linebacker, 2002 DPOY, and Super Bowl XXXVII champion.",
+    "Warren Sapp": "Bucs defensive tackle, 1999 DPOY, and a cornerstone of Super Bowl XXXVII.",
+    "Lee Roy Selmon": "Original Buccaneer and 1979 Defensive Player of the Year.",
+    "Sam Mills": "Dome Patrol linebacker in New Orleans and the emotional leader of the 1996 Panthers.",
+    "Kevin Greene": "Journeyman pass rusher who starred for the Rams, Steelers, and 1996 Panthers with double-digit sacks.",
+    "Tony Boselli": "Jaguars left tackle and the franchise's first Hall of Famer. First-team All-Pro in the late 1990s.",
+    "Jonathan Ogden": "Original Raven and a massive left tackle who protected the Super Bowl XXXV champions.",
+    "Walter Jones": "Seahawks left tackle and a first-ballot Hall of Famer from the Super Bowl XL years.",
+    "Orlando Pace": "Rams left tackle of the Greatest Show on Turf and Super Bowl XXXIV.",
+    "Willie Roaf": "Saints and Chiefs left tackle, a multi-time All-Pro on two franchises.",
+    "Larry Allen": "Cowboys mauling guard of the 1990s dynasty, later a 49er. Among the strongest linemen ever tested.",
+    "Bruce Matthews": "Oilers/Titans ironman who All-Pro'd at guard and center across three decades.",
+    "Mike Webster": "Steelers center of four Super Bowls, the prototype for the modern snapping ironman.",
+    "Dwight Stephenson": "Dolphins center often called the best to play the position; injuries cut short a peak 1980s run.",
+    "Jim Langer": "Miami's Super Bowl-era center on the 17-0 team and a Hall of Famer.",
+    "Jim Otto": "Raiders center who wore 00 and made the AFL All-League team through the 1960s.",
+    "Gene Upshaw": "Raiders guard and later union chief. Super Bowl champion and Hall of Famer.",
+    "Art Shell": "Raiders left tackle and later the NFL's first modern Black head coach. Super Bowl champion.",
+    "Ron Yary": "Vikings tackle and a first-overall pick who All-Pro'd through the Purple People Eater years.",
+    "Dan Dierdorf": "Cardinals right tackle and a 1970s All-Pro, later a lead NFL broadcaster.",
+    "Rayfield Wright": "Cowboys right tackle of the 1970s Super Bowl teams and a Hall of Famer.",
+    "Forrest Gregg": "Packers tackle/guard of the Lombardi dynasty, later a head coach. Vince called him the finest player he coached.",
+    "Jim Parker": "Colts two-way-era tackle/guard and a first-ballot Hall of Famer for Johnny Unitas.",
+    "Randall McDaniel": "Vikings left guard with a long All-Pro streak in the 1990s.",
+    "Dermontti Dawson": "Steelers center who succeeded Webster and became a Hall of Famer in his own right.",
+    "Mick Tingelhoff": "Vikings center who started 240 straight games and made the 1960s All-Decade team.",
+    "Brian Dawkins": "Eagles safety nicknamed Weapon X. Later a Bronco; one of the most complete safeties of the 2000s.",
+    "Sean Taylor": "Redskins safety whose brief career still produced an All-Pro peak before his 2007 death.",
+    "Kam Chancellor": "Enforcer of Seattle's Legion of Boom and a Super Bowl XLVIII champion.",
+    "Earl Thomas": "Center fielder of that same Seahawks secondary, a first-team All-Pro in the Super Bowl years.",
+    "Steve Atwater": "Broncos hitting safety of the John Elway Super Bowl teams and a Hall of Famer.",
+    "Kenny Easley": "Seahawks safety and 1984 Defensive Player of the Year whose career was shortened by injury.",
+    "Larry Wilson": "Cardinals safety who popularized the safety blitz and intercepted 52 passes.",
+    "Ken Houston": "Oilers and Redskins safety, a 10-time Pro Bowler famous for goal-line stands and INT returns.",
+    "Paul Krause": "Vikings safety and the NFL's career interceptions leader (81).",
+    "Willie Wood": "Packers free safety of the 1960s championship teams and a Hall of Famer.",
+    "Jake Scott": "Dolphins safety and Super Bowl VII MVP on the 17-0 club.",
+    "Dick Anderson": "Dolphins safety who intercepted 8 passes in 1973 and won Defensive Player of the Year.",
+    "Cliff Harris": "Cowboys safety of the 1970s Super Bowl teams, nicknamed Captain Crash.",
+    "Jack Tatum": "Raiders safety known as The Assassin. A Super Bowl XI champion.",
+    "Johnny Robinson": "Chiefs safety and Super Bowl IV champion, an AFL All-League fixture.",
+    "Mel Gray": "Cardinals receiver in the 1970s and, separately, a later All-Pro return specialist with Detroit — two distinct Mel Grays in NFL history; this app's Cardinals WR seasons are the receiver.",
+    "Billy Johnson": "White Shoes, an Oilers and Falcons return ace whose dance and punt-return TDs were 1970s/80s theater.",
+    "Brian Mitchell": "Redskins all-purpose back and the NFL's career all-purpose yardage leader for a time.",
+    "Desmond Howard": "Packers Super Bowl XXXI MVP for a 99-yard kickoff return. Heisman winner who bounced around as a returner.",
+    "Rick Upchurch": "Broncos punt returner and receiver, a mid-1970s All-Pro in the return game.",
+    "Mike Nelms": "Redskins returner of the early 1980s, a Pro Bowl special-teamer on those Washington clubs.",
+    "Abe Woodson": "49ers kick returner of the early 1960s, among the first modern return specialists.",
+    "Christian McCaffrey": "Panthers and 49ers all-purpose back. The 2019 Carolina season (1,387 rush, 116 catches) and 2023 San Francisco OPOY year are twin peaks.",
+    "Derrick Henry": "Titans King Henry. The 2020 season (2,027 rush yards) recalled Earl Campbell in the same city.",
+    "Saquon Barkley": "Giants OROY who later rushed for a championship-caliber 2,000-yard pace with the Eagles in 2024.",
+    "Justin Jefferson": "Vikings receiver who posted 1,809 yards in 2022 and immediately became a yearly All-Pro candidate.",
+    "Ja'Marr Chase": "Bengals receiver and Super Bowl LVI deep threat, OROY in 2021 with Joe Burrow.",
+    "Tyreek Hill": "Chiefs speedster of Super Bowl LIV, later a Dolphins 1,700-yard receiver.",
+    "Davante Adams": "Packers (then Raiders) route technician with multiple 1,300-yard, double-digit-TD seasons.",
+    "Cooper Kupp": "Rams Super Bowl LVI offensive engine who won the 2021 receiving Triple Crown.",
+    "CeeDee Lamb": "Cowboys receiver who exploded into a 1,700-yard, 100-catch star in the 2020s.",
+    "Amon-Ra St. Brown": "Lions possession receiver and a centerpiece of Detroit's 2020s revival.",
+    "Mike Evans": "Buccaneers receiver with a record streak of 1,000-yard seasons to start a career.",
+    "DeAndre Hopkins": "Texans (then Cardinals/Titans) contested-catch specialist with multiple All-Pro years in Houston.",
+    "Andre Johnson": "Texans original star receiver; 115-catch, 1,500-yard seasons put Houston on the map.",
+    "Torry Holt": "Rams Greatest Show receiver who led the NFL in yards in 2000 and 2003.",
+    "Isaac Bruce": "Rams Super Bowl XXXIV hero (the winning touchdown catch) and a Hall of Fame deep threat.",
+    "Marvin Harrison": "Colts precise route runner opposite Peyton Manning, including a 143-catch 2002 season.",
+    "Reggie Wayne": "Harrison's longtime partner and a later Colts No. 1, Super Bowl XLI champion.",
+    "Hines Ward": "Steelers Super Bowl XL MVP, a blocking receiver who also piled up 1,000-yard years.",
+    "Antonio Brown": "Steelers 2010s All-Pro who posted historic catch and yardage totals before later stops.",
+    "Julio Jones": "Falcons receiver of the 2015 1,871-yard season and Super Bowl LI.",
+    "Odell Beckham Jr.": "Giants one-handed-catch star and later a Super Bowl LVI champion with the Rams.",
+    "Stefon Diggs": "Vikings Minneapolis Miracle hero who later posted 100-catch Bills seasons.",
+    "Cam Newton": "Panthers 2015 MVP who ran and threw Carolina to Super Bowl 50. OROY in 2011.",
+    "Russell Wilson": "Seahawks Super Bowl XLVIII champion and a dual-threat quarterback through the 2010s.",
+    "Ben Roethlisberger": "Steelers quarterback of Super Bowls XL and XLIII, a 4,900-yard passer in 2014 and 2018.",
+    "Eli Manning": "Giants two-time Super Bowl MVP (XLII and XLVI) who twice beat Brady's Patriots.",
+    "Philip Rivers": "Chargers ironman passer with a 2008 peak (34 TDs) and a late Colts season.",
+    "Drew Bledsoe": "Patriots 1990s franchise quarterback whose 1994 and 1996 seasons set the table for the Brady era.",
+    "Troy Aikman": "Cowboys quarterback of three Super Bowls in the 1990s. Super Bowl XXVII MVP.",
+    "Jim Kelly": "Bills no-huddle quarterback who reached four straight Super Bowls. The 1991 season (33 TDs) is the K-Gun peak.",
+    "Boomer Esiason": "Bengals 1988 MVP who took Cincinnati to Super Bowl XXIII.",
+    "Ken Anderson": "Bengals West Coast-style passer and 1981 MVP, Super Bowl XVI starter.",
+    "Brian Sipe": "Browns Kardiac Kids quarterback and 1980 NFL MVP.",
+    "Joe Theismann": "Redskins 1983 MVP and Super Bowl XVII champion.",
+    "Phil Simms": "Giants Super Bowl XXI MVP and the 1984 4,000-yard breakout starter.",
+    "Randall Cunningham": "Eagles dual-threat pioneer; later the 1998 Vikings 15-1 quarterback.",
+    "Mark Brunell": "Jaguars lefty who threw for 4,367 yards in 1996 and put Jacksonville in the AFC title game.",
+    "Rich Gannon": "Raiders 2002 MVP who led Oakland to Super Bowl XXXVII.",
+    "Jeff Garcia": "49ers Pro Bowl quarterback of the early 2000s after a CFL start.",
+    "Donovan McNabb": "Eagles quarterback of Super Bowl XXXIX and four straight NFC Championship games.",
+    "Michael Vick": "Falcons dual-threat who later won Comeback Player of the Year with the 2010 Eagles.",
+    "Matt Ryan": "Falcons 2016 MVP of the 4,944-yard, Super Bowl LI season.",
+    "Andrew Luck": "Colts No. 1 pick whose 2014 (40 TDs) and 2018 comeback seasons were All-Pro caliber before a sudden retirement.",
+    "Carson Wentz": "Eagles 2017 MVP candidate before injury; that roster won Super Bowl LII with Nick Foles.",
+    "Nick Foles": "Eagles Super Bowl LII MVP of the Philly Special, and a 27-TD, 2-INT regular season in 2013.",
+    "Joe Flacco": "Ravens Super Bowl XLVII MVP after a legendary 2012 playoff run.",
+    "Baker Mayfield": "Browns OROY in 2018 who later revived Tampa Bay's offense in 2023.",
+    "Jameis Winston": "Buccaneers 2019 5,109-yard season, then later a Saints and Browns veteran.",
+    "Dak Prescott": "Cowboys OROY in 2016 and a 36-TD passer in 2023.",
+    "Matthew Stafford": "Lions 5,038-yard passer in 2011 who later won Super Bowl LVI with the Rams.",
+    "Jared Goff": "Rams Super Bowl LIII starter who later led the Lions' 2020s revival.",
+    "Kirk Cousins": "Redskins 4,917-yard 2016 season and later a Vikings 13-4 starter; finished with Atlanta.",
+    "Alex Smith": "49ers NFC title-game starter, Chiefs rebuild quarterback, and a comeback story in Washington.",
+    "Colin Kaepernick": "49ers Super Bowl XLVII starter whose 2012–13 runs mixed designed runs and deep shots.",
+    "Jimmy Garoppolo": "49ers Super Bowl LIV starter after Brady-era years in New England.",
+    "Brock Purdy": "Mr. Irrelevant who quarterbacked the 49ers to Super Bowl LVIII and a 2023 4,280-yard season.",
+    "C.J. Stroud": "Texans OROY in 2023 (4,108 yards) who immediately ended Houston's playoff drought.",
+    "Jayden Daniels": "Commanders 2024 OROY who immediately made Washington a playoff team.",
+    "Bo Nix": "Broncos 2024 rookie starter who threw 29 touchdowns in year one.",
+    "Drake Maye": "Patriots 2024 rookie quarterback who flashed franchise-QB traits in a rebuild.",
+    "Jordan Love": "Packers 2023 breakout (4,159 yards, 32 TDs) after sitting behind Rodgers.",
+    "Geno Smith": "Seahawks Comeback Player of the Year in 2022 after a long journeyman stretch.",
+    "Tua Tagovailoa": "Dolphins 2023 4,624-yard passer in Mike McDaniel's scheme.",
+    "Deshaun Watson": "Texans 2020 4,823-yard, 33-TD season before later legal and trade turmoil.",
+    "Ryan Tannehill": "Titans 2019 midseason takeover that produced an AFC title-game trip.",
+    "David Carr": "Original Texans quarterback, the first pick of the 2002 expansion draft class.",
+    "Matt Schaub": "Texans 2009 Pro Bowl passer (4,770 yards) of Houston's first playoff-caliber years.",
+    "Kerry Collins": "Original Panthers starter who later took the Giants to Super Bowl XXXV.",
+    "Jake Delhomme": "Panthers Super Bowl XXXVIII quarterback.",
+    "Steve Beuerlein": "Panthers 1999 4,436-yard, 36-TD season.",
+    "Vinny Testaverde": "Well-traveled passer whose 1996 Ravens and 1998 Jets seasons were productive stops among many.",
+    "Trent Dilfer": "Ravens Super Bowl XXXV starter after Buccaneers years.",
+    "Tony Banks": "Rams and Ravens starter of the late 1990s.",
+    "Jeff George": "Colts No. 1 pick who later had a 4,143-yard Falcons season in 1995.",
+    "Ickey Woods": "Bengals rookie smash in 1988 (1,066 yards, 15 TDs) and the Ickey Shuffle of Super Bowl XXIII.",
+    "Corey Dillon": "Bengals workhorse who later rushed for 1,635 yards on the 2004 Patriots Super Bowl team.",
+    "Jamal Anderson": "Falcons Dirty Bird back of the 1998 Super Bowl season (1,846 rush yards).",
+    "Warrick Dunn": "Bucs OROY and later a 1,400-yard Falcon. A complete back who also returned kicks as a rookie.",
+    "George Rogers": "Saints 1981 OROY (1,674 yards) who later scored 18 TDs for the 1986 Redskins.",
+    "Ricky Williams": "Saints first-overall back who then rushed for 1,853 yards in Miami in 2002.",
+    "Deuce McAllister": "Saints 2003 1,641-yard season, the franchise's modern featured back before the Brees years.",
+    "Fred Taylor": "Jaguars 1,500-yard back of 2003 and a long-time Jacksonville engine.",
+    "Maurice Jones-Drew": "Jaguars 2011 rushing champion (1,606 yards).",
+    "Leonard Fournette": "Jaguars 2017 rookie smash who later won Super Bowl LV with Tampa Bay.",
+    "Eddie George": "Oilers/Titans workhorse of Super Bowl XXXIV and a 1996 Offensive Rookie of the Year.",
+    "Chris Johnson": "Titans 2,006-yard, 2009 season — the last 2,000-yard rusher before Henry.",
+    "Arian Foster": "Texans 2010 breakout (1,616 yards) and a two-time rushing champion.",
+    "Matt Forte": "Bears all-purpose back with 1,000-yard rushing seasons and 70-catch years.",
+    "Frank Gore": "49ers ironman who later added 1,000-yard seasons in Indianapolis. Third on the career rushing list.",
+    "LeSean McCoy": "Eagles 2013 rushing champion who later won Super Bowl LII as a reserve and played in Buffalo.",
+    "Ezekiel Elliott": "Cowboys 2016 1,631-yard rookie and a later 1,400-yard club-year back.",
+    "DeMarco Murray": "Cowboys 2014 rushing champ (1,845 yards) who later started in Philadelphia and Tennessee.",
+    "Marshawn Lynch": "Seahawks Beast Mode, Super Bowl XLVIII champion, famous for the Beast Quake run.",
+    "Ahman Green": "Packers 2003 1,883-yard, 20-TD season, the franchise's modern rushing peak.",
+    "Dorsey Levens": "Packers 1997 1,435-yard season and a Super Bowl XXXI champion.",
+    "Edgar Bennett": "Packers 1,000-yard back of the mid-1990s title window.",
+    "John Brockington": "Packers 1971 OROY and a 1,000-yard rusher in the post-Lombardi years.",
+    "Jim Taylor": "Packers fullback of the 1960s titles; 1962 brought 1,474 yards and 19 TDs.",
+    "Paul Hornung": "Packers Golden Boy, a runner-kicker-receiver who won the 1961 MVP.",
+    "Larry Csonka": "Dolphins Super Bowl VIII MVP and the 17-0 pounding back.",
+    "Mercury Morris": "Dolphins 1,000-yard complement to Csonka on the perfect-season club.",
+    "Otis Armstrong": "Broncos 1974 rushing champion (1,407 yards).",
+    "Floyd Little": "Broncos franchise back of the AFL/early NFL years and a Hall of Famer.",
+    "Clinton Portis": "Broncos OROY smash who later had 1,500-yard Redskins seasons.",
+    "Mike Anderson": "Broncos 2000 1,487-yard, 15-TD season from an overlooked seventh-rounder.",
+    "Sammy Winder": "Broncos 1980s featured back of the Elway Super Bowl years.",
+    "Joe Morris": "Giants 1986 1,516-yard, Super Bowl XXI back.",
+    "Ottis Anderson": "Cardinals 1979 OROY who later won Super Bowl XXV MVP with the Giants.",
+    "Rodney Hampton": "Giants 1990s workhorse with multiple 1,000-yard seasons.",
+    "Wilbert Montgomery": "Eagles 1979 1,512-yard back of Super Bowl XV.",
+    "Brian Westbrook": "Eagles all-purpose star; 2007 brought 1,333 rush yards and 90 catches.",
+    "Ricky Watters": "49ers, Eagles, and Seahawks 1,000-yard back; a Super Bowl XXIX champion.",
+    "Roger Craig": "First player with 1,000 rush and 1,000 receiving yards (1985) and a three-time Super Bowl 49er.",
+    "Garrison Hearst": "49ers 1998 1,570-yard season and Comeback Player of the Year after a gruesome ankle injury.",
+    "Charlie Garner": "49ers/Raiders change-of-pace back who caught 91 passes in Oakland's Super Bowl XXXVII year.",
+    "Jerome Bettis": "The Bus, a Rams OROY who became a Steelers Super Bowl XL champion.",
+    "Willie Parker": "Steelers 2006 1,494-yard season and a Super Bowl XL 75-yard TD.",
+    "Barry Foster": "Steelers 1992 1,690-yard smash.",
+    "James Wilder": "Bucs ironman of 1984 (1,544 rush, 85 catches).",
+    "Ricky Bell": "Bucs 1979 1,263-yard back of the franchise's first playoff run.",
+    "Mike Alstott": "Bucs fullback, a short-yardage battering ram on the Super Bowl XXXVII club.",
+    "Doug Martin": "Bucs 2012 1,454-yard rookie and a later 1,400-yard comeback.",
+    "Curt Warner": "Seahawks 1983 OROY and a 1,400-yard back in the mid-1980s.",
+    "Chris Warren": "Seahawks 1994 1,545-yard season.",
+    "Sherman Smith": "Original Seahawks featured back.",
+    "Gerald Riggs": "Falcons 1985 1,719-yard workhorse, later a Redskin.",
+    "William Andrews": "Falcons 1980s dual-threat back whose career was shortened by injury.",
+    "James Brooks": "Bengals all-purpose back of the Super Bowl XXIII years.",
+    "Pete Johnson": "Bengals fullback of the early 1980s.",
+    "Rudi Johnson": "Bengals 2005 1,458-yard season.",
+    "Joe Mixon": "Bengals Super Bowl LVI back and later a Texan.",
+    "Joseph Addai": "Colts Super Bowl XLI contributor and a later 1,000-yard starter.",
+    "Dominic Rhodes": "Colts 2001 1,104-yard UDFA smash.",
+    "Natrone Means": "Chargers Super Bowl XXIX 1,350-yard back.",
+    "Chuck Muncie": "Chargers 1981 19-TD back of Air Coryell.",
+    "Lionel James": "Chargers Little Train, a 1985 all-purpose dynamo.",
+    "Austin Ekeler": "Chargers receiving back with a 2022 18-TD season.",
+    "Melvin Gordon": "Chargers 1,000-yard back of the 2010s.",
+    "Ryan Mathews": "Chargers 2013 1,255-yard season.",
+    "Lawrence McCutcheon": "Rams 1970s 1,000-yard back.",
+    "Dick Bass": "Rams 1960s 1,000-yard back.",
+    "Wendell Tyler": "Rams and 49ers 1,000-yard back; Super Bowl XIX champion.",
+    "Charles White": "Rams 1987 1,374-yard season.",
+    "Greg Bell": "Rams 1988 16-TD season.",
+    "Cleveland Gary": "Rams 1990 14-TD back.",
+    "Lydell Mitchell": "Colts 1970s all-purpose back with 60-catch seasons.",
+    "Tom Matte": "Colts runner who also started at quarterback in an emergency 1965 playoff.",
+    "Lenny Moore": "Colts halfback/flanker and a 1964 scoring machine (20 TDs).",
+    "Alan Ameche": "Colts fullback of the 1958 title, still active in 1960.",
+    "Cookie Gilchrist": "Bills AFL bruiser and a 1962 rushing champion.",
+    "Abner Haynes": "Dallas Texans/Chiefs AFL original and a 1960s rushing/return star.",
+    "Mike Garrett": "Chiefs Heisman back and Super Bowl IV champion.",
+    "Clem Daniels": "Raiders AFL workhorse of the early 1960s.",
+    "Paul Lowe": "Chargers AFL championship back.",
+    "Keith Lincoln": "Chargers AFL title-game wrecking ball in 1963.",
+    "Billy Cannon": "Oilers Heisman back and later a Raiders tight end.",
+    "Charlie Tolar": "Oilers Human Bowling Ball, a 1,000-yard AFL fullback.",
+    "Matt Snell": "Jets Super Bowl III 121-yard rushing hero.",
+    "Emerson Boozer": "Jets scoring complement to Snell.",
+    "Jim Nance": "Patriots AFL bowling-ball fullback of 1966–67.",
+    "Carl Garrett": "Patriots AFL Rookie of the Year, later a Bear.",
+    "Larry Brown": "Redskins 1972 NFL MVP.",
+    "Calvin Hill": "Cowboys 1969 OROY and a 1,000-yard 1970s back.",
+    "Don Perkins": "Original Cowboys 1960s workhorse.",
+    "Walt Garrison": "Cowboys fullback of the early Super Bowl years.",
+    "Duane Thomas": "Cowboys Super Bowl VI featured back.",
+    "Chuck Foreman": "Vikings 1970s Swiss Army back; 1975 brought 22 total TDs.",
+    "Bill Brown": "Vikings 1960s fullback.",
+    "Dave Osborn": "Vikings 1960s/70s back.",
+    "Robert Smith": "Vikings 2000 1,521-yard season, then a sudden retirement.",
+    "Ted Brown": "Vikings 1981 1,000-yard back.",
+    "Darrin Nelson": "Vikings change-of-pace back of the 1980s.",
+    "Herschel Walker": "Cowboys, Vikings, and Eagles 1,000-yard back; the 1989 trade reshaped the NFC.",
+    "Tony Dorsett": "Cowboys 1977 OROY and Super Bowl XII champion; later a Bronco.",
+    "Daryl Johnston": "Cowboys fullback nicknamed Moose, a lead blocker for Emmitt Smith on three Super Bowl teams.",
+    "Marion Barber": "Cowboys 2000s short-yardage hammer.",
+    "Neal Anderson": "Bears featured back after Payton, a late-1980s 1,200-yard runner.",
+    "Rashaan Salaam": "Bears 1995 Heisman back with 1,074 yards as a rookie.",
+    "Anthony Thomas": "Bears 2001 1,183-yard A-Train season.",
+    "Thomas Jones": "Bears and Jets 1,300-yard veteran.",
+    "Jordan Howard": "Bears 2016 1,313-yard rookie smash.",
+    "David Montgomery": "Bears then Lions 1,000-yard back and a 2023 Lions TD machine.",
+    "Jahmyr Gibbs": "Lions 2020s dual-threat back who exploded in 2024.",
+    "Billy Sims": "Lions 1980 OROY whose career was shortened by a knee injury.",
+    "Dexter Bussey": "Lions 1970s back.",
+    "Mel Farr": "Lions 1967 OROY.",
+    "Nick Pietrosante": "Lions 1960s fullback.",
+    "Joe Cribbs": "Bills early-1980s 1,000-yard back.",
+    "Terry Miller": "Bills 1978 1,060-yard back.",
+    "Jim Braxton": "Bills fullback next to O.J. Simpson.",
+    "Kenneth Davis": "Bills complement back of the Super Bowl years.",
+    "Jamaal Charles": "Chiefs home-run back; 2010 and 2013 are efficiency masterpieces.",
+    "Larry Johnson": "Chiefs mid-2000s 1,700-yard, 20-TD back.",
+    "Christian Okoye": "Nigerian Nightmare, Chiefs 1989 rushing champion.",
+    "Ed Podolak": "Chiefs 1971 Christmas Game ironman.",
+    "Curtis McClinton": "Chiefs/Texans AFL fullback.",
+    "Robert Holmes": "Chiefs late-1960s back.",
+    "Isiah Pacheco": "Chiefs Super Bowl-era undrafted runner.",
+    "Clyde Edwards-Helaire": "Chiefs 2020 first-round change-of-pace back.",
+    "Mark van Eeghen": "Raiders 1970s 1,000-yard back and Super Bowl XI champion.",
+    "Pete Banaszak": "Raiders short-yardage scorer of the 1970s titles.",
+    "Bo Jackson": "Raiders two-sport comet whose 5.4-yard 1987 average still looks video-game.",
+    "Napoleon Kaufman": "Raiders 1997 1,294-yard speed back.",
+    "Harvey Williams": "Raiders 1995 1,114-yard season.",
+    "Tyrone Wheatley": "Raiders 2000 1,046-yard back.",
+    "Josh Jacobs": "Raiders 2022 rushing champion, later a Packer.",
+    "Napoleon McCallum": "Raiders/Navy back of the 1980s.",
+    "Lawrence Phillips": "Rams mid-1990s first-round back, a short and troubled stay.",
+    "Todd Gurley": "Rams OPOY in 2017 and Super Bowl LIII starter.",
+    "Kyren Williams": "Rams 2020s 1,000-yard featured back.",
+    "Steven Jackson": "Rams 2000s 1,000-yard ironman after the Greatest Show years.",
+    "James Stewart": "Jaguars then Lions 1,000-yard back.",
+    "T.J. Yeldon": "Jaguars 2015 featured rookie.",
+    "James Robinson": "Jaguars 2020 UDFA 1,070-yard smash.",
+    "Travis Etienne": "Jaguars 2022–23 1,000-yard back.",
+    "DeAngelo Williams": "Panthers 2008 1,515-yard, 18-TD season; later a Steeler.",
+    "Jonathan Stewart": "Panthers complement and later the Super Bowl 50 starter.",
+    "Stephen Davis": "Redskins 1999 17-TD back who later started Super Bowl XXXVIII for Carolina.",
+    "Tim Biakabutuka": "Panthers 1990s first-round back.",
+    "Anthony Johnson": "Panthers 1996 960-yard expansion-era back.",
+    "Fred Lane": "Panthers 1997 scorer.",
+    "Mike Tolbert": "Chargers/Panthers fullback and a short-yardage Pro Bowler.",
+    "John Kasay": "Original Panthers kicker of the 1996 NFC title team and Super Bowl XXXVIII.",
+    "Graham Gano": "Panthers Super Bowl 50 kicker, later a Giant.",
+    "Todd Sauerbrun": "Panthers All-Pro punter of the early 2000s.",
+    "Lamar Lathon": "Panthers 1996 13.5-sack All-Pro.",
+    "Mike Minter": "Panthers 1990s–2000s hard-hitting safety.",
+    "Muhsin Muhammad": "Panthers 2004 16-TD season; later a Bear.",
+    "Steve Smith Sr.": "Panthers undersized star of the 2005 1,563-yard season; later a Raven.",
+    "Wesley Walls": "Panthers 1999 12-TD tight end; earlier a Saint.",
+    "Greg Olsen": "Panthers 1,000-yard tight end of the Cam Newton Super Bowl years.",
+    "Patrick Jeffers": "Panthers 1999 deep-threat year.",
+    "Mark Carrier": "Original Panther receiver after Bucs and Browns 1,000-yard years.",
+    "Michael Bates": "Panthers All-Pro kick returner of the mid-1990s.",
+    "Eric Metcalf": "Browns return ace (1993) who also caught 100+ passes in Atlanta.",
+  };
+
+  function factualBio(p, pos) {
+    const team = teamName(p.fromTeam || state.team);
+    const stats = p.stats ? ` Peak season ${p.season}: ${p.stats}.` : ` Peak documented season: ${p.season}.`;
+    const honor = p.blurb ? ` ${p.blurb}.` : "";
+    return `${p.name} played ${pos} for the ${team} and is listed here for a real ${p.season} season with that franchise.${stats}${honor}`.replace(/\.\./g, ".");
+  }
+
+  function wikiTitle(name) {
+    const aliases = {
+      "Joe Greene": "Joe Greene (American football)",
+      "Mean Joe Greene": "Joe Greene (American football)",
+      "O.J. Simpson": "O. J. Simpson",
+      "Steve Smith Sr.": "Steve Smith Sr.",
+      "Mel Gray": "Mel Gray (wide receiver)",
+      "Night Train Lane": "Dick Lane (American football)",
+      "Mean Joe Greene": "Joe Greene (American football)",
+    };
+    return aliases[name] || name;
+  }
+
+  let sheetState = null;
+
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function closePlayerSheet() {
+    const root = el("playerSheet");
+    if (!root) return;
+    root.classList.add("hidden");
+    root.setAttribute("hidden", "");
+    root.innerHTML = "";
+    sheetState = null;
+    document.body.style.overflow = "";
+  }
+
+  async function fillWikiBio(node, name) {
+    if (!node || KNOWN_BIO[name]) return;
+    try {
+      const title = wikiTitle(name);
+      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      if (!res.ok) return;
+      const data = await res.json();
+      const extract = (data.extract || "").trim();
+      if (extract.length > 80 && /football|NFL|AFL|Super Bowl|Pro Bowl|All-Pro|quarterback|running back|linebacker|tackle|kicker|punter|receiver|corner|safety/i.test(extract)) {
+        node.textContent = extract.split(/(?<=\.)\s+/).slice(0, 4).join(" ");
+      }
+    } catch (_) {
+      /* keep factual fallback */
+    }
+  }
+
+  function openPlayerSheet(player, pos, opts) {
+    const root = el("playerSheet");
+    if (!root || !player) return;
+    const canDraft = !!(opts && opts.draftIdx != null && !rosterFull());
+    sheetState = { player, pos, draftIdx: canDraft ? opts.draftIdx : null };
+    const jersey = jerseyLabel(player, pos);
+    const bio = KNOWN_BIO[player.name] || factualBio(player, pos);
+    const lastName = (player.name || "").split(" ").slice(-1)[0] || "player";
+    root.classList.remove("hidden");
+    root.removeAttribute("hidden");
+    document.body.style.overflow = "hidden";
+    root.innerHTML = `
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="${escapeHtml(player.name)}">
+        <div class="sheet-top">
+          <span class="badge ${(player.tier || "starter").toLowerCase()}">${escapeHtml(player.tier || "Starter")}</span>
+          <button type="button" class="sheet-x" id="sheetClose" aria-label="Close">X</button>
+        </div>
+        <div class="sheet-hero">
+          ${avatarHtml(player, pos, "avatar-lg")}
+          ${logoHtml(player.fromTeam || state.team, "logo-lg")}
+          <div>
+            <div class="name">${escapeHtml(player.name)} ${jersey}</div>
+            <div class="meta">${escapeHtml(pos)} · ${escapeHtml(teamName(player.fromTeam || state.team))}</div>
+          </div>
+        </div>
+        <div class="stats">${escapeHtml(player.stats || "")}</div>
+        <div class="meta">Peak season ${escapeHtml(player.season)}${player.fromDecade ? ` · ${escapeHtml(player.fromDecade)}` : ` · ${escapeHtml(state.decade)}`}</div>
+        <p class="bio" id="sheetBio">${escapeHtml(bio)}</p>
+        <div class="sheet-actions">
+          ${canDraft ? `<button type="button" class="btn btn-primary" id="sheetDraft">Draft ${escapeHtml(lastName)}</button>` : ""}
+          <button type="button" class="btn btn-secondary" id="sheetDone">Close</button>
+        </div>
+      </div>`;
+    el("sheetClose").onclick = closePlayerSheet;
+    el("sheetDone").onclick = closePlayerSheet;
+    const draft = el("sheetDraft");
+    if (draft) {
+      draft.onclick = () => {
+        const idx = sheetState && sheetState.draftIdx;
+        closePlayerSheet();
+        if (idx != null) pickPlayer(idx);
+      };
+    }
+    root.onclick = (ev) => {
+      if (ev.target === root) closePlayerSheet();
+    };
+    const sheet = root.querySelector(".sheet");
+    let touchStartY = null;
+    if (sheet) {
+      sheet.addEventListener("touchstart", (ev) => {
+        touchStartY = ev.changedTouches[0].clientY;
+      }, { passive: true });
+      sheet.addEventListener("touchend", (ev) => {
+        if (touchStartY == null) return;
+        const dy = ev.changedTouches[0].clientY - touchStartY;
+        touchStartY = null;
+        if (dy > 80) closePlayerSheet();
+      }, { passive: true });
+    }
+    fillWikiBio(el("sheetBio"), player.name);
+  }
+
   function randInt(a, b) {
     return a + Math.floor(Math.random() * (b - a + 1));
   }
@@ -654,11 +1197,17 @@ button, select { font: inherit; }
         <div class="meta">${p.season} · ${teamName(p.fromTeam || state.team)} · ${state.decade}</div>
         <div class="rating">${p.rating}</div>
         <div class="blurb">${p.blurb || ""}</div>
+        <div class="card-cta">Tap for card</div>
       </button>`
       )
       .join("");
     box.querySelectorAll(".card").forEach((btn) => {
-      btn.onclick = () => pickPlayer(Number(btn.dataset.idx));
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.idx);
+        const player = state.choices && state.choices[idx];
+        if (!player) return;
+        openPlayerSheet(player, state.selectedSlot, { draftIdx: idx });
+      };
     });
   }
 
@@ -681,7 +1230,7 @@ button, select { font: inherit; }
                 <div class="pos">${pos}</div><div class="pname">${selected ? "Selected" : "Tap"}</div>
               </button>`;
             }
-            return `<div class="roster-slot filled" data-pos="${pos}">
+            return `<button type="button" class="roster-slot filled" data-pos="${pos}">
               <div class="slot-row">
                 ${avatarHtml(pl, pos, "avatar-xs")}
                 ${logoHtml(pl.fromTeam || "", "logo-xs")}
@@ -690,7 +1239,7 @@ button, select { font: inherit; }
               <div class="pname">${pl.name} ${jerseyLabel(pl, pos)}</div>
               <div class="prating">${pl.rating} · '${String(pl.season).slice(-2)}</div>
               <div class="slot-stats">${pl.stats || ""}</div>
-            </div>`;
+            </button>`;
           })
           .join("");
         return `<div class="section-label">${label}</div><div class="roster-grid">${cells}</div>`;
@@ -699,6 +1248,13 @@ button, select { font: inherit; }
 
     grid.querySelectorAll(".roster-slot.selectable").forEach((btn) => {
       btn.onclick = () => selectSlot(btn.dataset.pos);
+    });
+    grid.querySelectorAll(".roster-slot.filled").forEach((btn) => {
+      btn.onclick = () => {
+        const pos = btn.dataset.pos;
+        const pl = state.roster[pos];
+        if (pl) openPlayerSheet(pl, pos);
+      };
     });
 
     const power = el("powerBar");
@@ -1117,6 +1673,9 @@ button, select { font: inherit; }
     el("btnPlayoffs").onclick = startPlayoffs;
     el("btnStartSeason").onclick = simulateSeason;
     if (el("btnNewGame")) el("btnNewGame").onclick = resetRoster;
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape") closePlayerSheet();
+    });
   }
 
   function boot() {
