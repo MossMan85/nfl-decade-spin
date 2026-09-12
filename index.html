@@ -85,6 +85,7 @@ button, select { font: inherit; }
   padding: 8px 14px; font-weight:700; white-space:nowrap; font-size:.9rem;
 }
 .respin-pill strong { color: var(--gold); font-size:1.1rem; }
+.respin-scope { font-weight:600; color: var(--muted); font-size:.8rem; margin-left:4px; }
 .respin-pill.empty { border-color: var(--red); color: var(--red); }
 .respin-pill.infinite { border-color: var(--green); color: var(--green); }
 .dials { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
@@ -294,7 +295,7 @@ button, select { font: inherit; }
         <label class="toggle-row" for="infiniteRespins">
           <span>
             <strong>Infinite respins</strong>
-            <span class="hint" style="margin:0;display:block">Off = 4 extra spins per roster.</span>
+            <span class="hint" style="margin:0;display:block">Off = 4 extra spins per slot (resets after you draft).</span>
           </span>
           <input type="checkbox" id="infiniteRespins" />
         </label>
@@ -1148,7 +1149,7 @@ button, select { font: inherit; }
       return;
     }
     const n = state.respinsLeft;
-    box.innerHTML = `<span class="respin-pill ${n === 0 ? "empty" : ""}">Respins left: <strong>${n}</strong></span>`;
+    box.innerHTML = `<span class="respin-pill ${n === 0 ? "empty" : ""}">Respins left: <strong>${n}</strong><span class="respin-scope"> this slot</span></span>`;
   }
 
   function renderSlotBanner() {
