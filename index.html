@@ -404,6 +404,7 @@ button, select { font: inherit; }
     decade: "2000s",
     team: "NE",
     choices: null,
+    choicesForSlot: null,
     season: null,
     undefeated: false,
     playoff: null,
@@ -1042,8 +1043,9 @@ button, select { font: inherit; }
     if (draft) {
       draft.onclick = () => {
         const idx = sheetState && sheetState.draftIdx;
+        const pos = sheetState && sheetState.pos;
         closePlayerSheet();
-        if (idx != null) pickPlayer(idx);
+        if (idx != null) pickPlayer(idx, pos);
       };
     }
     root.onclick = (ev) => {
@@ -1303,6 +1305,7 @@ button, select { font: inherit; }
     const slot = state.selectedSlot;
     const doReveal = () => {
       state.choices = getChoices(state.team, state.decade, slot);
+      state.choicesForSlot = slot;
       render();
     };
     if (animated) {
@@ -1318,9 +1321,9 @@ button, select { font: inherit; }
     }
   }
 
-  function pickPlayer(idx) {
-    if (!state.choices || !state.selectedSlot || rosterFull()) return;
-    const slot = state.selectedSlot;
+  function pickPlayer(idx, slotOverride) {
+    const slot = slotOverride || state.choicesForSlot || state.selectedSlot;
+    if (!state.choices || !slot || rosterFull() || state.roster[slot]) return;
     const player = state.choices[idx];
     state.roster[slot] = {
       ...player,
@@ -1329,6 +1332,7 @@ button, select { font: inherit; }
       slot,
     };
     state.choices = null;
+    state.choicesForSlot = null;
     state.selectedSlot = null;
     state.slotHasReveal = false;
     if (rosterFull()) {
@@ -1344,6 +1348,7 @@ button, select { font: inherit; }
     state.selectedSlot = null;
     state.slotHasReveal = false;
     state.choices = null;
+    state.choicesForSlot = null;
     state.season = null;
     state.undefeated = false;
     state.playoff = null;
@@ -1363,6 +1368,7 @@ button, select { font: inherit; }
     state.selectedSlot = null;
     state.slotHasReveal = false;
     state.choices = null;
+    state.choicesForSlot = null;
     state.season = null;
     state.undefeated = false;
     state.playoff = null;
