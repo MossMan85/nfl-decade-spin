@@ -168,16 +168,17 @@ SLOT_GROUP = {
     "K": ["K"], "P": ["P"], "RET": ["RET"],
 }
 
-# OL/DL/LB/DB may widen within trench/secondary. Skill groups (QB/RB/WR/TE/K/P) never widen.
+# Never widen OT↔OG↔C or DE↔DT. Skill groups never widen.
+# LB/DB may widen within secondary/LB family only after same-pos cross-decade padding fails.
+# RET may borrow return-capable WR/RB/CB only as last resort to reach 3.
 WIDEN = {
-    "OT": ["OG", "C"], "OG": ["OT", "C"], "C": ["OG", "OT"],
-    "DE": ["OLB", "DT"], "DT": ["DE"],
-    "OLB": ["DE", "LB", "MLB"], "MLB": ["LB", "OLB"], "LB": ["OLB", "MLB"],
+    "OLB": ["LB", "MLB"], "MLB": ["LB", "OLB"], "LB": ["OLB", "MLB"],
     "CB": ["S", "FS", "SS"], "S": ["CB", "FS", "SS"], "SS": ["S", "FS", "CB"], "FS": ["S", "SS", "CB"],
-    # RET may borrow return-capable skill/DB bodies; do not widen WR/TE/QB/RB/K/P into each other.
     "RET": ["WR", "RB", "CB"],
 }
 
+# Primary groups that must never mix with adjacent trench positions.
+STRICT_POS = {"OT", "OG", "C", "DE", "DT", "QB", "RB", "WR", "TE", "K", "P"}
 SKILL_NO_WIDEN = {"QB", "RB", "WR", "TE", "K", "P"}
 
 NFLVERSE_POS = {
@@ -232,12 +233,26 @@ def name_key(name: str) -> str:
     n = clean_name(name).lower()
     n = n.replace(".", "").replace("'", "").replace("’", "")
     n = re.sub(r"\s+", " ", n).strip()
-    # collapse "Joe Conrad" into "Bobby Joe Conrad" style suffixes later
-    return n
+    # Collapse spaced initials: "l c greenwood" == "lc greenwood"
+    parts = n.split()
+    out = []
+    i = 0
+    while i < len(parts):
+        if len(parts[i]) == 1:
+            initials = parts[i]
+            while i + 1 < len(parts) and len(parts[i + 1]) == 1:
+                i += 1
+                initials += parts[i]
+            out.append(initials)
+        else:
+            out.append(parts[i])
+        i += 1
+    return " ".join(out)
 
 
 ALIASES = {
     "joe conrad": "bobby joe conrad",
+    "david crow": "john david crow",
     "oj simpson": "oj simpson",
     "mean joe greene": "joe greene",
     "joe greene": "joe greene",
@@ -905,10 +920,14 @@ def merge_records(groups: list[list[dict]]) -> list[dict]:
             nk = ALIASES.get(name_key(r["name"]), name_key(r["name"]))
             if nk == "bobby joe conrad":
                 r["name"] = "Bobby Joe Conrad"
+            if nk == "john david crow":
+                r["name"] = "John David Crow"
             if nk == "daryl johnston":
                 r["name"] = "Daryl Johnston"
             if nk == "joe greene":
                 r["name"] = "Joe Greene"
+            if nk == "lc greenwood":
+                r["name"] = "L.C. Greenwood"
             key = (nk, r["team"], r["year"], r["pos"])
             if key not in idx:
                 idx[key] = r
@@ -922,7 +941,7 @@ def pick_top(cands: list[dict], n: int = 3) -> list[dict]:
     # unique by name, best rating then year
     best = {}
     for r in cands:
-        name = name_key(r["name"])
+        name = ALIASES.get(name_key(r["name"]), name_key(r["name"]))
         prev = best.get(name)
         score = r.get("score", r.get("rating", 0) * 10)
         if not prev or (r.get("rating", 0), score, r.get("year", 0)) > (
@@ -962,48 +981,93 @@ def first_decade_for(team: str) -> str | None:
     return None
 
 
-def fill_key(all_by: dict, team: str, dec: str, slot: str) -> list[dict]:
-    """Fill a roster key with same-position players whose season year is IN `dec`.
+def decade_distance(a: str, b: str) -> int:
+    return abs(int(a[:4]) - int(b[:4])) // 10
 
-    - Never widen WR/TE/QB/RB/K/P across skill groups.
-    - Never pull neighbor-decade seasons into this decade's keys.
-    - Pre-founding decades: borrow from the franchise's first real decade only
-      (cards keep their real season years).
+
+def neighbor_decades(dec: str) -> list[str]:
+    return sorted(
+        [d for d in DECADES if d != dec],
+        key=lambda d: (decade_distance(dec, d), d),
+    )
+
+
+def fill_key(all_by: dict, team: str, dec: str, slot: str) -> list[dict]:
+    """Fill a roster key with exactly 3 real same-position players when possible.
+
+    Priority:
+      1) In-decade (or first franchise decade if pre-founding) + exact position
+      2) Same franchise + exact position from nearest other decades
+      3) Limited widen for LB/DB/RET only (never OT↔OG↔C or DE↔DT)
+
+    Cards always keep their actual season year.
     """
     groups = SLOT_GROUP[slot]
+    primary = groups[0]
     years = franchise_years(team, dec)
-
-    # Expansion / pre-founding: use first decade the franchise existed.
+    pref_dec = dec
     if not years:
         first = first_decade_for(team)
-        if not first or first == dec:
+        if not first:
             return []
-        return fill_key(all_by, team, first, slot)
+        pref_dec = first
 
-    cands = collect_for(all_by, team, dec, groups)
-    picked = pick_top(cands, 3)
-    if len(picked) >= 3:
-        return picked
+    picked: list[dict] = []
+    seen: set[str] = set()
 
-    # Widen only within OL/DL/LB/DB (and RET sources) — same decade only.
-    primary = groups[0]
-    extra_groups: list[str] = []
-    if primary not in SKILL_NO_WIDEN:
+    def absorb(cands: list[dict]) -> None:
+        for r in pick_top(cands, 40):
+            nk = ALIASES.get(name_key(r["name"]), name_key(r["name"]))
+            if nk in seen:
+                continue
+            seen.add(nk)
+            # Canonical display name when aliased
+            if nk == "john david crow":
+                r = dict(r)
+                r["name"] = "John David Crow"
+            elif nk == "lc greenwood":
+                r = dict(r)
+                r["name"] = "L.C. Greenwood"
+            picked.append(r)
+            if len(picked) >= 3:
+                return
+
+    # 1) Preferred decade, exact position
+    absorb(collect_for(all_by, team, pref_dec, groups))
+
+    # 2) Neighbor decades, exact position (nearest first)
+    if len(picked) < 3:
+        for nd in neighbor_decades(pref_dec):
+            if not franchise_years(team, nd):
+                continue
+            absorb(collect_for(all_by, team, nd, groups))
+            if len(picked) >= 3:
+                break
+
+    # 3) Limited widen — never for STRICT_POS (OL/DL/skill)
+    if len(picked) < 3 and primary not in STRICT_POS:
+        extra: list[str] = []
         for g in groups:
-            extra_groups.extend(WIDEN.get(g, []))
-        extra_groups = [g for g in extra_groups if g not in groups]
-        if extra_groups:
-            cands = collect_for(all_by, team, dec, groups + extra_groups)
-            picked = pick_top(cands, 3)
+            extra.extend(WIDEN.get(g, []))
+        extra = [g for g in dict.fromkeys(extra) if g not in groups]
+        if extra:
+            absorb(collect_for(all_by, team, pref_dec, extra))
+            if len(picked) < 3:
+                for nd in neighbor_decades(pref_dec):
+                    if not franchise_years(team, nd):
+                        continue
+                    absorb(collect_for(all_by, team, nd, extra))
+                    if len(picked) >= 3:
+                        break
 
-    # Prefer 1–2 real in-decade same-position players over wrong-pos / wrong-era fill.
-    return pick_top(cands if cands else [], 3)
+    return picked[:3]
 
 
 def to_card(rec: dict) -> dict:
     card = {
         "name": rec["name"],
         "season": str(rec["year"]),
+        "pos": rec.get("pos"),
         "rating": int(rec.get("rating") or 75),
         "tier": rec.get("tier") or "Starter",
         "blurb": rec.get("blurb") or f"{rec['year']} season",
@@ -1055,9 +1119,7 @@ def main():
                 picked = fill_key(all_by, team, dec, slot)
                 key = f"{team}|{dec}|{slot}"
                 if len(picked) < 3:
-                    holes.append((key, [p["name"] for p in picked]))
-                # Keep only real in-decade (or first-decade for pre-founding) cards —
-                # never pad with wrong position or wrong-era seasons.
+                    holes.append((key, [p["name"] for p in picked], [p.get("pos") for p in picked]))
                 roster[key] = [to_card(p) for p in picked[:3]]
 
     print("keys", len(roster), "expected", 32 * 7 * 25)
@@ -1097,10 +1159,10 @@ def main():
     # coverage samples
     samples = [
         "CHI|1970s|RB1", "GB|1960s|QB", "BUF|1970s|RB1", "SF|1980s|WR1",
-        "BAL|1960s|MLB", "HOU|1980s|DE", "JAX|1960s|LT", "CAR|1970s|K",
-        "NE|2000s|QB", "KC|2010s|TE", "DET|1990s|RB1", "PIT|1970s|MLB",
-        "SEA|2010s|CB", "TB|2000s|DT", "WAS|1980s|RB1", "LAC|1980s|QB",
-        "ARI|1960s|WR1", "MIN|1970s|DE", "MIA|1970s|C", "LV|1970s|QB",
+        "BAL|2000s|RDT", "BAL|2000s|LDE", "JAX|1960s|LT", "CAR|1970s|K",
+        "NE|2000s|LT", "NE|2000s|LG", "NE|2000s|C", "DAL|1990s|C",
+        "DAL|1990s|LT", "PIT|1970s|LDE", "PIT|1970s|LDT", "HOU|1960s|QB",
+        "ARI|1960s|WR1", "MIN|1970s|LDE", "MIA|1970s|C", "LV|1970s|QB",
     ]
     for s in samples:
         names = [p["name"] + " " + p.get("stats", "") for p in roster.get(s, [])]

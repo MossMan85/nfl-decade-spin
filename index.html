@@ -91,6 +91,19 @@ button, select { font: inherit; }
 .dials { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .compact-dials .dial { padding: 8px; }
 .compact-dials .dial select { padding: 8px 10px; font-size: .95rem; }
+.lock-row {
+  display:flex; flex-wrap:wrap; gap:8px; margin: 0 0 10px; align-items:center;
+}
+.lock-chip {
+  appearance:none; border:1px solid var(--line); background:#101a2c; color:var(--muted);
+  border-radius:999px; padding:10px 14px; font-weight:800; font-size:.85rem;
+  min-height:44px; cursor:pointer; letter-spacing:.02em;
+}
+.lock-chip.active {
+  background: rgba(245,197,66,.16); color: var(--gold);
+  border-color: rgba(245,197,66,.55); box-shadow: 0 0 0 1px rgba(245,197,66,.2);
+}
+.lock-hint { color: var(--muted); font-size:.78rem; flex:1 1 140px; line-height:1.3; }
 .sticky-build {
   position: sticky; top: 0; z-index: 8;
   background: linear-gradient(180deg, var(--panel) 80%, rgba(22,32,51,.92));
@@ -291,7 +304,7 @@ button, select { font: inherit; }
     <section id="view-start">
       <div class="panel start-panel">
         <h2>New Game</h2>
-        <p class="hint">Tap a slot, hit SPIN, tap a player to inspect, then Draft. First spin per slot is free. Respins reset to 4 after each draft.</p>
+        <p class="hint">Tap a slot, hit SPIN, tap a player to inspect, then Draft. First spin per slot is free. Respins reset to 4 after each draft. Use Lock decade / Lock team to re-roll only the unlocked dial(s).</p>
         <label class="toggle-row" for="infiniteRespins">
           <span>
             <strong>Infinite respins</strong>
@@ -330,6 +343,11 @@ button, select { font: inherit; }
             <label for="teamSelect">Team</label>
             <select id="teamSelect"></select>
           </div>
+        </div>
+        <div class="lock-row" role="group" aria-label="Spin locks">
+          <button type="button" class="lock-chip" id="lockDecade" aria-pressed="false">Lock decade</button>
+          <button type="button" class="lock-chip" id="lockTeam" aria-pressed="false">Lock team</button>
+          <span class="lock-hint" id="spinScopeHint">SPIN re-rolls team + decade</span>
         </div>
         <div class="actions">
           <button class="btn btn-primary" id="btnSpin" type="button">SPIN</button>
@@ -411,6 +429,8 @@ button, select { font: inherit; }
     playoff: null,
     respinsLeft: DEFAULT_RESPINS,
     infiniteRespins: false,
+    lockDecade: false,
+    lockTeam: false,
   };
 
   const ROUND_META = [
@@ -1181,7 +1201,7 @@ button, select { font: inherit; }
       return;
     }
     if (!state.choices) {
-      box.innerHTML = `<p class="hint slim">SPIN for a random decade + team.</p>`;
+      box.innerHTML = `<p class="hint slim">${spinScopeLabel()}.</p>`;
       return;
     }
     box.innerHTML = state.choices
@@ -1276,14 +1296,49 @@ button, select { font: inherit; }
     revealChoices({ animated: false, costRespin: false });
   }
 
+  function spinScopeLabel() {
+    const ld = state.lockDecade;
+    const lt = state.lockTeam;
+    if (ld && lt) return "Both dials locked — unlock one to SPIN";
+    if (ld && !lt) return "SPIN re-rolls team only";
+    if (!ld && lt) return "SPIN re-rolls decade only";
+    return "SPIN re-rolls team + decade";
+  }
+
+  function updateLockUI() {
+    const ld = el("lockDecade");
+    const lt = el("lockTeam");
+    if (ld) {
+      ld.classList.toggle("active", !!state.lockDecade);
+      ld.setAttribute("aria-pressed", state.lockDecade ? "true" : "false");
+      ld.textContent = state.lockDecade ? "Decade locked" : "Lock decade";
+    }
+    if (lt) {
+      lt.classList.toggle("active", !!state.lockTeam);
+      lt.setAttribute("aria-pressed", state.lockTeam ? "true" : "false");
+      lt.textContent = state.lockTeam ? "Team locked" : "Lock team";
+    }
+    const hint = el("spinScopeHint");
+    if (hint) hint.textContent = spinScopeLabel();
+    const spinBtn = el("btnSpin");
+    if (spinBtn) spinBtn.title = spinScopeLabel();
+  }
+
   function spinDials() {
     if (rosterFull() || !state.selectedSlot) return;
+    if (state.lockDecade && state.lockTeam) return;
     if (state.slotHasReveal && !canAffordRespin()) return;
-    state.decade = pickRandom(D().decades);
-    state.team = pickRandom(D().teams).code;
-    el("decadeSelect").value = state.decade;
-    el("teamSelect").value = state.team;
-    updateTeamLogo();
+    if (!state.lockDecade) {
+      state.decade = pickRandom(D().decades);
+      el("decadeSelect").value = state.decade;
+    }
+    if (!state.lockTeam) {
+      state.team = pickRandom(D().teams).code;
+      el("teamSelect").value = state.team;
+      updateTeamLogo();
+    } else {
+      updateTeamLogo();
+    }
     revealChoices(true);
   }
 
@@ -1636,9 +1691,11 @@ button, select { font: inherit; }
   function updateSpinButtons() {
     const noSlot = !state.selectedSlot || rosterFull();
     const blocked = state.slotHasReveal && !canAffordRespin();
-    const dis = noSlot || blocked;
+    const bothLocked = state.lockDecade && state.lockTeam;
+    const dis = noSlot || blocked || bothLocked;
     if (el("btnSpin")) el("btnSpin").disabled = dis;
     if (el("btnSimSeason")) el("btnSimSeason").classList.toggle("hidden", !rosterFull());
+    updateLockUI();
   }
 
   function render() {
@@ -1675,6 +1732,22 @@ button, select { font: inherit; }
       if (!state.playoff) startPlayoffs();
       else setView("playoffs");
     };
+    const lockDecBtn = el("lockDecade");
+    const lockTeamBtn = el("lockTeam");
+    if (lockDecBtn) {
+      lockDecBtn.onclick = () => {
+        state.lockDecade = !state.lockDecade;
+        updateLockUI();
+        updateSpinButtons();
+      };
+    }
+    if (lockTeamBtn) {
+      lockTeamBtn.onclick = () => {
+        state.lockTeam = !state.lockTeam;
+        updateLockUI();
+        updateSpinButtons();
+      };
+    }
     el("btnSpin").onclick = spinDials;
     el("btnSimSeason").onclick = simulateSeason;
     el("btnResim").onclick = simulateSeason;
