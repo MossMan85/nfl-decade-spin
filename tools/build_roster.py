@@ -15,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from historical_seasons import HSEASONS
+from depth_pad import DEPTH_PAD
 
 WIKI = Path("/tmp/nfldata/wiki")
 STATS_DIR = Path("/tmp/nfldata/stats")
@@ -23,10 +24,28 @@ INDEX = ROOT / "index.html"
 OUT_JS = ROOT / "nfl-data.js"
 
 DECADES = ["1960s", "1970s", "1980s", "1990s", "2000s", "2010s", "2020s"]
-OFFENSE = ["QB", "RB1", "RB2", "WR1", "WR2", "TE", "LT", "LG", "C", "RG", "RT"]
-DEFENSE = ["LDE", "LDT", "RDT", "RDE", "WLB", "MLB", "SLB", "LCB", "RCB", "SS", "FS"]
+
+# Scheme-specific depth charts (UI picks one offense + one defense per run).
+OFFENSE_TWO_BACK = ["QB", "RB1", "RB2", "WR1", "WR2", "TE", "LT", "LG", "C", "RG", "RT"]
+OFFENSE_SINGLE_BACK = ["QB", "RB", "WR1", "WR2", "WR3", "TE", "LT", "LG", "C", "RG", "RT"]
+DEFENSE_43 = ["LDE", "LDT", "RDT", "RDE", "WLB", "MLB", "SLB", "LCB", "RCB", "SS", "FS"]
+DEFENSE_34 = ["LE", "NT", "RE", "LOLB", "LILB", "RILB", "ROLB", "LCB", "RCB", "SS", "FS"]
 SPECIAL = ["K", "P", "RET"]
-SLOTS = OFFENSE + DEFENSE + SPECIAL
+
+# Back-compat aliases used by samples / older UI paths.
+OFFENSE = OFFENSE_TWO_BACK
+DEFENSE = DEFENSE_43
+
+# Generate rosterDB for every slot either scheme can query.
+def _uniq(seq):
+    seen, out = set(), []
+    for x in seq:
+        if x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out
+
+SLOTS = _uniq(OFFENSE_TWO_BACK + OFFENSE_SINGLE_BACK + DEFENSE_43 + DEFENSE_34 + SPECIAL)
 
 TEAMS = [
     ("ARI", "Arizona Cardinals"), ("ATL", "Atlanta Falcons"), ("BAL", "Baltimore Ravens"),
@@ -154,18 +173,30 @@ POS_HEAD = {
 
 SLOT_GROUP = {
     "QB": ["QB"],
-    "RB1": ["RB"], "RB2": ["RB"],
-    "WR1": ["WR"], "WR2": ["WR"],
+    "RB": ["RB"], "RB1": ["RB"], "RB2": ["RB"],
+    "WR1": ["WR"], "WR2": ["WR"], "WR3": ["WR"],
     "TE": ["TE"],
     "LT": ["OT"], "RT": ["OT"],
     "LG": ["OG"], "RG": ["OG"],
     "C": ["C"],
+    # 4-3 front
     "LDE": ["DE"], "RDE": ["DE"],
     "LDT": ["DT"], "RDT": ["DT"],
     "WLB": ["OLB", "LB"], "SLB": ["OLB", "LB"], "MLB": ["MLB", "LB"],
+    # 3-4 front
+    "LE": ["DE"], "RE": ["DE"], "NT": ["DT"],
+    "LOLB": ["OLB", "LB"], "ROLB": ["OLB", "LB"],
+    "LILB": ["MLB", "LB"], "RILB": ["MLB", "LB"],
     "LCB": ["CB"], "RCB": ["CB"],
     "SS": ["SS", "S"], "FS": ["FS", "S"],
     "K": ["K"], "P": ["P"], "RET": ["RET"],
+}
+
+# Extra franchise codes that may supply SAME-decade padding (predecessors already
+# folded into modern codes for Oilers→TEN, Colts BAL→IND, Chargers SD→LAC, etc.).
+# Never merge Texans↔Oilers or Ravens↔Browns/Colts.
+LINEAGE_PAD = {
+    # Identity only — predecessors live under the modern code already.
 }
 
 # Never widen OT↔OG↔C or DE↔DT. Skill groups never widen.
@@ -219,6 +250,14 @@ def num(v, default=0.0):
 def clean_name(name: str) -> str:
     name = html.unescape(name or "")
     name = re.sub(r"\[.*?\]", "", name)
+    # Drop trailing role/team parentheticals: "Ernie McMillan (RT)", "Andy Russell (Right)"
+    name = re.sub(
+        r"\s*\(\s*(?:L|R|LT|RT|LG|RG|C|LE|RE|NT|OLB|ILB|MLB|WLB|SLB|Left|Right|Offense|Defense)[^)]*\)\s*$",
+        "",
+        name,
+        flags=re.I,
+    )
+    name = re.sub(r"\s*\([^)]*(?:Steelers|Team|Pro Bowl)[^)]*\)\s*$", "", name, flags=re.I)
     name = re.sub(r"\s+", " ", name).strip(" ,;.|")
     name = re.sub(r"\bO\.\s*J\.\s*", "O.J. ", name)
     name = re.sub(r"\bA\.\s*J\.\s*", "A.J. ", name)
@@ -249,6 +288,11 @@ def name_key(name: str) -> str:
         i += 1
     return " ".join(out)
 
+
+# Known honor-parse mis-tags: drop these name+pos combos.
+POS_NAME_BLOCK = {
+    ("chuck walker", "C"),  # Cardinals DT, not center
+}
 
 ALIASES = {
     "joe conrad": "bobby joe conrad",
@@ -524,7 +568,7 @@ def load_wiki_records() -> list[dict]:
 
 def load_curated() -> list[dict]:
     recs = []
-    for row in HSEASONS:
+    for row in list(HSEASONS) + list(DEPTH_PAD):
         name, team, pos, year, jersey, rating, tier, stats, blurb = row
         recs.append({
             "name": clean_name(name),
@@ -565,7 +609,7 @@ def load_existing_reals() -> list[dict]:
         if blurb.lower() in {"emergency", "pair", "prior", "rot", "depth", "fill", "depth chart fill"}:
             blurb = f"{year} season"
         recs.append({
-            "name": name,
+            "name": clean_name(name),
             "team": row.get("team"),
             "pos": group,
             "year": year,
@@ -576,6 +620,53 @@ def load_existing_reals() -> list[dict]:
             "blurb": blurb or f"{year} season",
             "source": "legacy-real",
         })
+    return recs
+
+
+
+def normalize_group_pos(pos: str) -> str | None:
+    """Map slot or group labels to canonical roster groups."""
+    p = (pos or "").upper()
+    if p in SLOT_GROUP:
+        return SLOT_GROUP[p][0]
+    if p in {"QB", "RB", "WR", "TE", "OT", "OG", "C", "DE", "DT", "OLB", "MLB", "LB", "CB", "S", "SS", "FS", "K", "P", "RET"}:
+        return p
+    mapped = NFLVERSE_POS.get(p)
+    return mapped
+
+
+def load_indec_harvest() -> list[dict]:
+    """Prior in-decade real cards (no cross-decade bleed) used as depth padding."""
+    p = Path("/tmp/nfldata/prev_indec_harvest.json")
+    if not p.exists():
+        return []
+    recs = []
+    for row in json.loads(p.read_text()):
+        name = clean_name(row.get("name") or "")
+        if not name or "Emergency" in name:
+            continue
+        team = row.get("team")
+        if team not in TEAM_CODES:
+            continue
+        year = int(row["year"])
+        group = normalize_group_pos(row.get("pos") or "")
+        if not group:
+            continue
+        rec = {
+            "name": name,
+            "team": team,
+            "pos": group,
+            "year": year,
+            "jersey": row.get("jersey"),
+            "rating": int(row.get("rating") or 76),
+            "tier": row.get("tier") or "Starter",
+            "stats": row.get("stats"),
+            "blurb": row.get("blurb") or f"{year} season",
+            "source": "harvest",
+        }
+        if row.get("photo"):
+            rec["photo"] = row["photo"]
+        recs.append(rec)
     return recs
 
 
@@ -918,6 +1009,8 @@ def merge_records(groups: list[list[dict]]) -> list[dict]:
                 continue
             r["name"] = clean_name(r["name"])
             nk = ALIASES.get(name_key(r["name"]), name_key(r["name"]))
+            if (nk, r["pos"]) in POS_NAME_BLOCK:
+                continue
             if nk == "bobby joe conrad":
                 r["name"] = "Bobby Joe Conrad"
             if nk == "john david crow":
@@ -981,84 +1074,90 @@ def first_decade_for(team: str) -> str | None:
     return None
 
 
-def decade_distance(a: str, b: str) -> int:
-    return abs(int(a[:4]) - int(b[:4])) // 10
+def team_exists_in_decade(team: str, dec: str) -> bool:
+    return bool(franchise_years(team, dec))
 
 
-def neighbor_decades(dec: str) -> list[str]:
-    return sorted(
-        [d for d in DECADES if d != dec],
-        key=lambda d: (decade_distance(dec, d), d),
-    )
+def pad_teams(team: str) -> list[str]:
+    """Franchise + optional lineage predecessors (same year-range only)."""
+    extra = LINEAGE_PAD.get(team, [])
+    out = [team]
+    for t in extra:
+        if t not in out:
+            out.append(t)
+    return out
 
 
 def fill_key(all_by: dict, team: str, dec: str, slot: str) -> list[dict]:
-    """Fill a roster key with exactly 3 real same-position players when possible.
+    """Fill a roster key with up to 3 real same-position in-decade players.
 
-    Priority:
-      1) In-decade (or first franchise decade if pre-founding) + exact position
-      2) Same franchise + exact position from nearest other decades
-      3) Limited widen for LB/DB/RET only (never OT↔OG↔C or DE↔DT)
-
-    Cards always keep their actual season year.
+    Hard rules:
+      - Season year must fall in the dial decade (no cross-decade padding).
+      - Unique players only (best season kept if multiple would rank).
+      - Exact position first; limited LB/DB/RET widen only within the decade.
+      - Never OT↔OG↔C, DE↔DT, TE↔WR bleed.
+      - Pre-founding franchise×decade → empty (UI auto-rerolls).
+      - Last resort: lineage predecessor seasons still in that decade.
     """
+    if not team_exists_in_decade(team, dec):
+        return []
+
     groups = SLOT_GROUP[slot]
     primary = groups[0]
-    years = franchise_years(team, dec)
-    pref_dec = dec
-    if not years:
-        first = first_decade_for(team)
-        if not first:
-            return []
-        pref_dec = first
 
     picked: list[dict] = []
     seen: set[str] = set()
 
     def absorb(cands: list[dict]) -> None:
-        for r in pick_top(cands, 40):
+        # Drop any candidate whose season is outside the dial decade.
+        start = int(dec[:4])
+        end = start + 9
+        in_dec = [r for r in cands if start <= int(r["year"]) <= end]
+        for r in pick_top(in_dec, 40):
             nk = ALIASES.get(name_key(r["name"]), name_key(r["name"]))
             if nk in seen:
                 continue
             seen.add(nk)
-            # Canonical display name when aliased
+            r = dict(r)
             if nk == "john david crow":
-                r = dict(r)
                 r["name"] = "John David Crow"
             elif nk == "lc greenwood":
-                r = dict(r)
                 r["name"] = "L.C. Greenwood"
+            elif nk == "bobby joe conrad":
+                r["name"] = "Bobby Joe Conrad"
+            elif nk == "joe greene":
+                r["name"] = "Joe Greene"
+            elif nk == "daryl johnston":
+                r["name"] = "Daryl Johnston"
             picked.append(r)
             if len(picked) >= 3:
                 return
 
-    # 1) Preferred decade, exact position
-    absorb(collect_for(all_by, team, pref_dec, groups))
+    # 1) In-decade, exact position, this franchise
+    absorb(collect_for(all_by, team, dec, groups))
 
-    # 2) Neighbor decades, exact position (nearest first)
+    # 2) In-decade lineage predecessor, exact position
     if len(picked) < 3:
-        for nd in neighbor_decades(pref_dec):
-            if not franchise_years(team, nd):
+        for alt in pad_teams(team)[1:]:
+            if not team_exists_in_decade(alt, dec):
                 continue
-            absorb(collect_for(all_by, team, nd, groups))
+            absorb(collect_for(all_by, alt, dec, groups))
             if len(picked) >= 3:
                 break
 
-    # 3) Limited widen — never for STRICT_POS (OL/DL/skill)
+    # 3) Limited in-decade widen — never for STRICT_POS (OL/DL/skill)
     if len(picked) < 3 and primary not in STRICT_POS:
         extra: list[str] = []
         for g in groups:
             extra.extend(WIDEN.get(g, []))
         extra = [g for g in dict.fromkeys(extra) if g not in groups]
         if extra:
-            absorb(collect_for(all_by, team, pref_dec, extra))
-            if len(picked) < 3:
-                for nd in neighbor_decades(pref_dec):
-                    if not franchise_years(team, nd):
-                        continue
-                    absorb(collect_for(all_by, team, nd, extra))
-                    if len(picked) >= 3:
-                        break
+            for tcode in pad_teams(team):
+                if not team_exists_in_decade(tcode, dec):
+                    continue
+                absorb(collect_for(all_by, tcode, dec, extra))
+                if len(picked) >= 3:
+                    break
 
     return picked[:3]
 
@@ -1099,11 +1198,14 @@ def main():
     print("Loading legacy reals…")
     legacy = load_existing_reals()
     print(" legacy", len(legacy))
+    print("Loading in-decade harvest…")
+    harvest = load_indec_harvest()
+    print(" harvest", len(harvest))
     print("Loading nflverse…")
     modern = load_nflverse()
     print(" nflverse/roster", len(modern))
 
-    merged = merge_records([curated, wiki, modern, legacy])
+    merged = merge_records([curated, wiki, modern, legacy, harvest])
     merged = collapse_wr_te_conflicts(merged)
     print(" merged unique player-seasons", len(merged))
 
@@ -1113,39 +1215,77 @@ def main():
 
     roster = {}
     holes = []
+    empty_pre = []
     for team, _name in TEAMS:
         for dec in DECADES:
+            exists = team_exists_in_decade(team, dec)
             for slot in SLOTS:
-                picked = fill_key(all_by, team, dec, slot)
                 key = f"{team}|{dec}|{slot}"
+                if not exists:
+                    roster[key] = []
+                    empty_pre.append(key)
+                    continue
+                picked = fill_key(all_by, team, dec, slot)
                 if len(picked) < 3:
                     holes.append((key, [p["name"] for p in picked], [p.get("pos") for p in picked]))
                 roster[key] = [to_card(p) for p in picked[:3]]
 
-    print("keys", len(roster), "expected", 32 * 7 * 25)
-    print("holes after fallback", len(holes))
+    print("keys", len(roster), "slots", len(SLOTS), "expected", 32 * 7 * len(SLOTS))
+    print("pre-founding empty keys", len(empty_pre))
+    print("short (<3) after in-decade fill", len(holes))
     if holes[:12]:
         print(" sample holes", holes[:12])
 
-    # sanity: no emergency / obviously generated leftovers
+    # sanity: decade lock, unique names, no fakes
     banned = {"Emergency Starter", "Keith Rowe", "Frank Caldwell", "Gene Cameron", "Don Drayton"}
     bad = []
+    decade_bad = []
+    dup_bad = []
     for key, players in roster.items():
-        if len(players) < 3:
-            bad.append(("short", key, [p["name"] for p in players]))
+        team, dec, slot = key.split("|")
+        start, end = int(dec[:4]), int(dec[:4]) + 9
+        if not team_exists_in_decade(team, dec):
+            if players:
+                bad.append(("pre-founding-nonempty", key, [p["name"] for p in players]))
+            continue
+        names = set()
         for p in players:
+            y = int(str(p.get("season", "0"))[:4])
+            if not (start <= y <= end):
+                decade_bad.append((key, p["name"], p.get("season")))
+            nk = name_key(p["name"])
+            if nk in names:
+                dup_bad.append((key, p["name"]))
+            names.add(nk)
             if p.get("generated") or any(b in p["name"] for b in banned):
                 bad.append(("fake", key, p["name"]))
+        if len(players) < 3:
+            bad.append(("short", key, [p["name"] for p in players]))
+    print("decade violations", len(decade_bad))
+    print("dup name violations", len(dup_bad))
     print("bad flags", len(bad))
+    if decade_bad[:5]:
+        print(" sample decade bad", decade_bad[:5])
 
     meta = load_meta() or {}
     data = {
         "decades": DECADES,
         "teams": [{"code": c, "name": n} for c, n in TEAMS],
+        "founding": FOUNDING,
         "positions": SLOTS,
-        "offense": OFFENSE,
-        "defense": DEFENSE,
+        "offense": OFFENSE_TWO_BACK,
+        "defense": DEFENSE_43,
         "special": SPECIAL,
+        "schemes": {
+            "offense": {
+                "twoBack": OFFENSE_TWO_BACK,
+                "singleBack": OFFENSE_SINGLE_BACK,
+            },
+            "defense": {
+                "fourThree": DEFENSE_43,
+                "threeFour": DEFENSE_34,
+            },
+        },
         "rosterDB": roster,
         "coaches": meta.get("coaches", {}),
         "champHeroes": meta.get("champHeroes", {}),
@@ -1158,10 +1298,10 @@ def main():
 
     # coverage samples
     samples = [
-        "CHI|1970s|RB1", "GB|1960s|QB", "BUF|1970s|RB1", "SF|1980s|WR1",
-        "BAL|2000s|RDT", "BAL|2000s|LDE", "JAX|1960s|LT", "CAR|1970s|K",
-        "NE|2000s|LT", "NE|2000s|LG", "NE|2000s|C", "DAL|1990s|C",
-        "DAL|1990s|LT", "PIT|1970s|LDE", "PIT|1970s|LDT", "HOU|1960s|QB",
+        "CHI|1970s|RB1", "CHI|1980s|RB1", "GB|1960s|QB", "BUF|1970s|RB1", "SF|1980s|WR1",
+        "BAL|2000s|RDT", "BAL|2000s|NT", "PIT|1970s|LE", "PIT|1970s|LOLB",
+        "NE|2000s|WR3", "NE|2000s|RB", "JAX|1960s|LT", "CAR|1970s|K",
+        "DAL|1990s|C", "HOU|1960s|QB", "HOU|2000s|QB", "TEN|1970s|QB",
         "ARI|1960s|WR1", "MIN|1970s|LDE", "MIA|1970s|C", "LV|1970s|QB",
     ]
     for s in samples:

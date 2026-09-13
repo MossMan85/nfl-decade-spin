@@ -273,27 +273,72 @@ button, select { font: inherit; }
   .sheet-backdrop { align-items: center; }
   .sheet { border-radius: 18px; }
 }
+.scheme-block { margin: 10px 0 0; }
+.scheme-label {
+  font-size: .72rem; font-weight: 800; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px;
+}
+.scheme-picks { display:flex; gap:8px; flex-wrap:wrap; }
+.scheme-chip {
+  appearance:none; flex:1; min-width:120px; min-height:44px;
+  border:1px solid var(--line); background:#101a2c; color:var(--muted);
+  border-radius:12px; padding:10px 12px; font-weight:800; font-size:.88rem;
+  cursor:pointer; text-align:left;
+}
+.scheme-chip small { display:block; font-weight:600; font-size:.72rem; color:var(--muted); margin-top:2px; }
+.scheme-chip.active {
+  background: rgba(245,197,66,.16); color: var(--gold);
+  border-color: rgba(245,197,66,.55); box-shadow: 0 0 0 1px rgba(245,197,66,.2);
+}
+.toast {
+  position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(120%);
+  z-index: 60; max-width: min(420px, calc(100vw - 24px));
+  background: #1a2740; color: var(--text); border: 1px solid var(--gold);
+  border-radius: 12px; padding: 10px 14px; font-size: .85rem; font-weight: 700;
+  box-shadow: var(--shadow); opacity: 0; transition: transform .2s ease, opacity .2s ease;
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.footer-note { color: var(--muted); font-size: .72rem; margin: 8px 0 0; }
 @media (max-width: 560px) {
-  body { padding: 8px; padding-bottom: 28px; }
-  .hero.compact { padding: 10px 12px; margin-bottom: 8px; }
-  .hero-sub { font-size: .8rem; }
-  .tabs { margin: 8px 0; }
-  .tab { min-height: 44px; padding: 10px 6px; }
-  .dials { grid-template-columns: 1fr 1fr; gap: 6px; }
-  .dial select { min-height: 46px; padding: 10px 8px; }
-  .btn-primary { min-height: 54px; font-size: 1.12rem; letter-spacing: .04em; }
-  .roster-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .roster-slot, .roster-slot.empty.selectable { min-height: 96px; padding: 12px 10px; }
-  .roster-slot .pname { font-size: .9rem; }
-  .choices { gap: 8px; }
+  body { padding: 6px; padding-bottom: 22px; }
+  .hero.compact { padding: 8px 10px; margin-bottom: 6px; border-radius: 14px; }
+  .hero h1 { font-size: 1.15rem; margin-bottom: .1em; }
+  .hero-sub { font-size: .74rem; line-height: 1.25; }
+  .panel { padding: 8px; margin-bottom: 8px; border-radius: 12px; }
+  .panel-head h2 { font-size: .95rem; }
+  .sticky-build { margin: -8px -8px 6px; padding: 8px 8px 6px; }
+  .tabs { margin: 6px 0; gap: 6px; }
+  .tab { min-height: 40px; padding: 8px 4px; font-size: .85rem; }
+  .dials { grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+  .compact-dials .dial { padding: 6px; }
+  .dial select { min-height: 42px; padding: 8px 6px; font-size: .9rem; }
+  .lock-row { gap: 6px; margin-bottom: 8px; }
+  .lock-chip { min-height: 40px; padding: 8px 10px; font-size: .78rem; }
+  .lock-hint { font-size: .7rem; }
+  .btn { min-height: 46px; padding: 10px 12px; border-radius: 10px; }
+  .btn-primary { min-height: 50px; font-size: 1.05rem; letter-spacing: .03em; }
+  .roster-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .roster-slot, .roster-slot.empty.selectable { min-height: 78px; padding: 8px 8px; border-radius: 10px; }
+  .roster-slot .pname { font-size: .82rem; }
+  .roster-slot .prating, .roster-slot .slot-stats { font-size: .68rem; }
+  .section-label { margin: 8px 0 4px; font-size: .72rem; }
+  .choices { gap: 6px; }
+  .card { padding: 10px; min-height: 132px; border-radius: 12px; }
+  .card .name { font-size: .98rem; margin: 6px 0 2px; }
+  .respin-pill { padding: 6px 10px; font-size: .82rem; }
   .hint.slim { display:none; }
-  .team-logo-box { padding: 6px 10px; margin-bottom: 6px; }
+  .team-logo-box { padding: 4px 8px; margin-bottom: 4px; }
+  .scheme-chip { min-height: 42px; padding: 8px 10px; font-size: .82rem; }
+  .start-panel { margin-bottom: 8px; }
+  .toggle-row { padding: 10px; }
 }
 
 </style>
 </head>
 <body>
   <div id="playerSheet" class="sheet-backdrop hidden" hidden></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div class="wrap">
     <header class="hero compact">
       <h1>NFL Decade Spin</h1>
@@ -304,15 +349,29 @@ button, select { font: inherit; }
     <section id="view-start">
       <div class="panel start-panel">
         <h2>New Game</h2>
-        <p class="hint">Tap a slot, hit SPIN, tap a player to inspect, then Draft. First spin per slot is free. Respins reset to 4 after each draft. Use Lock decade / Lock team to re-roll only the unlocked dial(s).</p>
-        <label class="toggle-row" for="infiniteRespins">
+        <p class="hint">Pick schemes, then build. Tap a slot · SPIN · inspect · Draft. First spin per slot is free. Respins reset to 4 after each draft.</p>
+        <div class="scheme-block">
+          <div class="scheme-label">Offense</div>
+          <div class="scheme-picks" id="offenseScheme" role="group" aria-label="Offense scheme">
+            <button type="button" class="scheme-chip active" data-scheme="two-back" aria-pressed="true">Two-back<small>RB1 + RB2 · WR1/WR2</small></button>
+            <button type="button" class="scheme-chip" data-scheme="single-back" aria-pressed="false">Single-back<small>1 RB · WR1/WR2/WR3</small></button>
+          </div>
+        </div>
+        <div class="scheme-block">
+          <div class="scheme-label">Defense</div>
+          <div class="scheme-picks" id="defenseScheme" role="group" aria-label="Defense scheme">
+            <button type="button" class="scheme-chip active" data-scheme="4-3" aria-pressed="true">4-3<small>LDE/LDT/RDT/RDE · WLB/MLB/SLB</small></button>
+            <button type="button" class="scheme-chip" data-scheme="3-4" aria-pressed="false">3-4<small>LE/NT/RE · LOLB/LILB/RILB/ROLB</small></button>
+          </div>
+        </div>
+        <label class="toggle-row" for="infiniteRespins" style="margin-top:12px">
           <span>
             <strong>Infinite respins</strong>
             <span class="hint" style="margin:0;display:block">Off = 4 extra spins per slot (resets after you draft).</span>
           </span>
           <input type="checkbox" id="infiniteRespins" />
         </label>
-        <div class="actions" style="margin-top:14px">
+        <div class="actions" style="margin-top:12px">
           <button class="btn btn-primary" id="btnStartGame" type="button">Start Building</button>
         </div>
       </div>
@@ -369,7 +428,7 @@ button, select { font: inherit; }
         </div>
         <p class="hint slim">Empty = tap. Gold = selected. Grey = filled.</p>
         <div id="rosterGrid"></div>
-        <p class="footer-note">2-back · 4-3 · K / P / RET</p>
+        <p class="footer-note" id="schemeFooter">2-back · 4-3 · K / P / RET</p>
       </div>
     </section>
 
@@ -431,6 +490,8 @@ button, select { font: inherit; }
     infiniteRespins: false,
     lockDecade: false,
     lockTeam: false,
+    offScheme: "two-back",
+    defScheme: "4-3",
   };
 
   const ROUND_META = [
@@ -441,9 +502,129 @@ button, select { font: inherit; }
 
   function el(id) { return document.getElementById(id); }
 
+  function offenseSlots() {
+    const sch = (D().schemes && D().schemes.offense) || {};
+    return state.offScheme === "single-back"
+      ? (sch.singleBack || ["QB","RB","WR1","WR2","WR3","TE","LT","LG","C","RG","RT"])
+      : (sch.twoBack || D().offense);
+  }
+
+  function defenseSlots() {
+    const sch = (D().schemes && D().schemes.defense) || {};
+    return state.defScheme === "3-4"
+      ? (sch.threeFour || ["LE","NT","RE","LOLB","LILB","RILB","ROLB","LCB","RCB","SS","FS"])
+      : (sch.fourThree || D().defense);
+  }
+
   function fillOrder() {
-    const d = D();
-    return [...d.offense, ...d.defense, ...d.special];
+    return [...offenseSlots(), ...defenseSlots(), ...(D().special || ["K","P","RET"])];
+  }
+
+  function schemeFooterLabel() {
+    const o = state.offScheme === "single-back" ? "1-back" : "2-back";
+    const d = state.defScheme === "3-4" ? "3-4" : "4-3";
+    return `${o} · ${d} · K / P / RET`;
+  }
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const node = el("toast");
+    if (!node || !msg) return;
+    node.textContent = msg;
+    node.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => node.classList.remove("show"), 2800);
+  }
+
+  function foundingYear(team) {
+    const f = (D().founding || {})[team];
+    return f == null ? 0 : f;
+  }
+
+  function teamExistsInDecade(team, decade) {
+    const start = parseInt(String(decade).slice(0, 4), 10);
+    const end = start + 9;
+    const founded = foundingYear(team);
+    if (founded > end) return false;
+    // Browns suspended 1996–1998; still have 1990–95 + 1999 in the 1990s dial.
+    if (team === "CLE" && decade === "1990s") return true;
+    return founded <= end;
+  }
+
+  function teamsForDecade(decade) {
+    return (D().teams || []).filter((t) => teamExistsInDecade(t.code, decade));
+  }
+
+  function decadesForTeam(team) {
+    return (D().decades || []).filter((d) => teamExistsInDecade(team, d));
+  }
+
+  function rosterKeyHasPlayers(team, decade, pos) {
+    const list = D().rosterDB[`${team}|${decade}|${pos}`];
+    return Array.isArray(list) && list.length > 0;
+  }
+
+  /** Keep SPIN on a franchise that existed in the dial decade (lineage OK). */
+  function ensureValidTeamDecade(opts) {
+    opts = opts || {};
+    const pos = opts.pos || state.selectedSlot;
+    if (teamExistsInDecade(state.team, state.decade)) {
+      if (!pos || rosterKeyHasPlayers(state.team, state.decade, pos)) return null;
+    }
+    const oldTeam = state.team;
+    const oldDec = state.decade;
+
+    // Prefer re-rolling team when decade is the constraint.
+    // 1) Prefer auto-reroll team for this decade
+    if (!state.lockTeam || opts.forceUnlockTeam || (state.lockTeam && !teamExistsInDecade(oldTeam, oldDec))) {
+      let pool = teamsForDecade(state.decade);
+      if (pos) pool = pool.filter((t) => rosterKeyHasPlayers(t.code, state.decade, pos));
+      if (!pool.length) pool = teamsForDecade(state.decade);
+      if (pool.length) {
+        let unlocked = false;
+        if (state.lockTeam) {
+          state.lockTeam = false;
+          unlocked = true;
+          updateLockUI();
+        }
+        state.team = pickRandom(pool).code;
+        const sel = el("teamSelect");
+        if (sel) sel.value = state.team;
+        updateTeamLogo();
+        const msg = unlocked
+          ? `Unlocked team — ${teamName(oldTeam)} wasn't in the ${state.decade}`
+          : `${teamName(oldTeam)} didn't exist in the ${state.decade} — rolled ${teamName(state.team)}`;
+        return msg;
+      }
+    }
+
+    // 2) Team locked (or no valid teams): re-roll decade if unlocked
+    if (!state.lockDecade) {
+      let pool = decadesForTeam(state.team);
+      if (pos) pool = pool.filter((d) => rosterKeyHasPlayers(state.team, d, pos));
+      if (!pool.length) pool = decadesForTeam(state.team);
+      if (pool.length) {
+        state.decade = pickRandom(pool);
+        const sel = el("decadeSelect");
+        if (sel) sel.value = state.decade;
+        return `${teamName(state.team)} wasn't in the ${oldDec} — rolled ${state.decade}`;
+      }
+    }
+
+    // 3) Both locked & invalid — unlock team and re-roll (user preference)
+    state.lockTeam = false;
+    updateLockUI();
+    let pool = teamsForDecade(state.decade);
+    if (pos) pool = pool.filter((t) => rosterKeyHasPlayers(t.code, state.decade, pos));
+    if (!pool.length) pool = teamsForDecade(state.decade);
+    if (pool.length) {
+      state.team = pickRandom(pool).code;
+      const sel = el("teamSelect");
+      if (sel) sel.value = state.team;
+      updateTeamLogo();
+      return `Unlocked team — ${teamName(oldTeam)} invalid for ${state.decade}`;
+    }
+    return `No valid franchise for ${state.decade}`;
   }
 
   function rosterPower() {
@@ -712,7 +893,7 @@ button, select { font: inherit; }
     "Brian Dawkins": "Eagles safety nicknamed Weapon X. Later a Bronco; one of the most complete safeties of the 2000s.",
     "Sean Taylor": "Redskins safety whose brief career still produced an All-Pro peak before his 2007 death.",
     "Kam Chancellor": "Enforcer of Seattle's Legion of Boom and a Super Bowl XLVIII champion.",
-    "Earl Thomas": "Center fielder of that same Seahawks secondary, a first-team All-Pro in the Super Bowl years.",
+    "Earl Thomas": "Seahawks free safety and center fielder of the Legion of Boom; first-team All-Pro in the Super Bowl years.",
     "Steve Atwater": "Broncos hitting safety of the John Elway Super Bowl teams and a Hall of Famer.",
     "Kenny Easley": "Seahawks safety and 1984 Defensive Player of the Year whose career was shortened by injury.",
     "Larry Wilson": "Cardinals safety who popularized the safety blitz and intercepted 52 passes.",
@@ -1106,11 +1287,15 @@ button, select { font: inherit; }
     teamSel.value = state.team;
     decadeSel.onchange = () => {
       state.decade = decadeSel.value;
+      const toast = ensureValidTeamDecade({ pos: state.selectedSlot });
+      if (toast) showToast(toast);
       updateTeamLogo();
       if (state.selectedSlot) revealChoices({ animated: false, costRespin: false });
     };
     teamSel.onchange = () => {
       state.team = teamSel.value;
+      const toast = ensureValidTeamDecade({ pos: state.selectedSlot });
+      if (toast) showToast(toast);
       updateTeamLogo();
       if (state.selectedSlot) revealChoices({ animated: false, costRespin: false });
     };
@@ -1236,10 +1421,12 @@ button, select { font: inherit; }
 
   function renderRoster() {
     const groups = [
-      ["Offense", D().offense],
-      ["Defense", D().defense],
+      ["Offense", offenseSlots()],
+      ["Defense", defenseSlots()],
       ["Special Teams", D().special],
     ];
+    const foot = el("schemeFooter");
+    if (foot) foot.textContent = schemeFooterLabel();
     const grid = el("rosterGrid");
     if (!grid) return;
     grid.innerHTML = groups
@@ -1333,12 +1520,15 @@ button, select { font: inherit; }
       el("decadeSelect").value = state.decade;
     }
     if (!state.lockTeam) {
-      state.team = pickRandom(D().teams).code;
+      const pool = teamsForDecade(state.decade);
+      state.team = pickRandom(pool.length ? pool : D().teams).code;
       el("teamSelect").value = state.team;
       updateTeamLogo();
     } else {
       updateTeamLogo();
     }
+    const toast = ensureValidTeamDecade({ pos: state.selectedSlot });
+    if (toast) showToast(toast);
     revealChoices(true);
   }
 
@@ -1360,7 +1550,16 @@ button, select { font: inherit; }
     }
     const slot = state.selectedSlot;
     const doReveal = () => {
-      state.choices = getChoices(state.team, state.decade, slot);
+      const toast = ensureValidTeamDecade({ pos: slot });
+      if (toast) showToast(toast);
+      let choices = getChoices(state.team, state.decade, slot);
+      // Never present an empty/invalid franchise decade — re-roll team once more.
+      if (!choices.length) {
+        const again = ensureValidTeamDecade({ pos: slot, forceUnlockTeam: true });
+        if (again) showToast(again);
+        choices = getChoices(state.team, state.decade, slot);
+      }
+      state.choices = choices;
       state.choicesForSlot = slot;
       render();
     };
@@ -1418,9 +1617,38 @@ button, select { font: inherit; }
     setView("start");
   }
 
+  function readSchemeUI() {
+    const oBtn = document.querySelector("#offenseScheme .scheme-chip.active");
+    const dBtn = document.querySelector("#defenseScheme .scheme-chip.active");
+    state.offScheme = (oBtn && oBtn.dataset.scheme) || state.offScheme || "two-back";
+    state.defScheme = (dBtn && dBtn.dataset.scheme) || state.defScheme || "4-3";
+    state.fillOrder = fillOrder();
+  }
+
+  function wireSchemePickers() {
+    function wire(groupId, onPick) {
+      const root = el(groupId);
+      if (!root) return;
+      root.querySelectorAll(".scheme-chip").forEach((btn) => {
+        btn.onclick = () => {
+          root.querySelectorAll(".scheme-chip").forEach((b) => {
+            b.classList.remove("active");
+            b.setAttribute("aria-pressed", "false");
+          });
+          btn.classList.add("active");
+          btn.setAttribute("aria-pressed", "true");
+          onPick(btn.dataset.scheme);
+        };
+      });
+    }
+    wire("offenseScheme", (v) => { state.offScheme = v; });
+    wire("defenseScheme", (v) => { state.defScheme = v; });
+  }
+
   function startGame() {
     const chk = el("infiniteRespins");
     state.infiniteRespins = !!(chk && chk.checked);
+    readSchemeUI();
     state.started = true;
     state.roster = {};
     state.selectedSlot = null;
@@ -1765,6 +1993,8 @@ button, select { font: inherit; }
       document.body.innerHTML = "<p style='padding:20px'>Failed to load data.js</p>";
       return;
     }
+    wireSchemePickers();
+    readSchemeUI();
     state.fillOrder = fillOrder();
     // Ensure team logo box exists near dials
     const dials = document.querySelector(".compact-dials") || document.querySelector(".dials");
