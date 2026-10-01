@@ -546,9 +546,12 @@ button, select { font: inherit; }
     const end = start + 9;
     const founded = foundingYear(team);
     if (founded > end) return false;
-    // Browns suspended 1996–1998; still have 1990–95 + 1999 in the 1990s dial.
-    if (team === "CLE" && decade === "1990s") return true;
-    return founded <= end;
+    // Any real season inside the decade counts (Browns: 1990–95 + 1999 despite the 1996–98 gap).
+    const gaps = ((D().gaps || {})[team]) || [];
+    for (let y = Math.max(start, founded); y <= end; y++) {
+      if (!gaps.includes(y)) return true;
+    }
+    return false;
   }
 
   function teamsForDecade(decade) {
@@ -591,9 +594,12 @@ button, select { font: inherit; }
         const sel = el("teamSelect");
         if (sel) sel.value = state.team;
         updateTeamLogo();
+        const existed = teamExistsInDecade(oldTeam, state.decade);
         const msg = unlocked
           ? `Unlocked team — ${teamName(oldTeam)} wasn't in the ${state.decade}`
-          : `${teamName(oldTeam)} didn't exist in the ${state.decade} — rolled ${teamName(state.team)}`;
+          : existed
+            ? `No ${pos || "players"} on file for ${teamName(oldTeam)} ${state.decade} — rolled ${teamName(state.team)}`
+            : `${teamName(oldTeam)} didn't exist in the ${state.decade} — rolled ${teamName(state.team)}`;
         return msg;
       }
     }
@@ -680,6 +686,8 @@ button, select { font: inherit; }
   function jerseyFor(player, pos) {
     if (player.jersey != null && player.jersey !== "") return player.jersey;
     if (player.number != null && player.number !== "") return player.number;
+    // Sourced cards carry an explicit "jersey" (null = not documented): never guess by name.
+    if (Object.prototype.hasOwnProperty.call(player, "jersey")) return null;
     if (KNOWN_JERSEY[player.name] != null) return KNOWN_JERSEY[player.name];
     return null;
   }
@@ -740,6 +748,7 @@ button, select { font: inherit; }
   function enrichPlayer(p, pos, team) {
     const out = { ...p };
     out.jersey = jerseyFor(out, pos);
+    if (out.jersey === undefined) out.jersey = null;
     out.stats = realStats(out);
     const photo = photoFor(out);
     if (photo) out.photo = photo;
@@ -1150,7 +1159,8 @@ button, select { font: inherit; }
   };
 
   function factualBio(p, pos) {
-    const team = teamName(p.fromTeam || state.team);
+    const team = p.club || teamName(p.fromTeam || state.team);
+    pos = p.pos || pos;
     const stats = p.stats ? ` Peak season ${p.season}: ${p.stats}.` : ` Peak documented season: ${p.season}.`;
     const honor = p.blurb ? ` ${p.blurb}.` : "";
     return `${p.name} played ${pos} for the ${team} and is listed here for a real ${p.season} season with that franchise.${stats}${honor}`.replace(/\.\./g, ".");
@@ -1189,16 +1199,21 @@ button, select { font: inherit; }
     document.body.style.overflow = "";
   }
 
-  async function fillWikiBio(node, name) {
+  async function fillWikiBio(node, name, player) {
     if (!node || KNOWN_BIO[name]) return;
+    // Only sourced cards with a Wikipedia title verified by name + birth date get a wiki summary
+    // (avoids pulling the wrong person's bio for common names).
+    if (player && Object.prototype.hasOwnProperty.call(player, "jersey") && !player.wiki) return;
     try {
-      const title = wikiTitle(name);
+      const title = (player && player.wiki) || wikiTitle(name);
       const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
       const res = await fetch(url, { headers: { Accept: "application/json" } });
       if (!res.ok) return;
       const data = await res.json();
       const extract = (data.extract || "").trim();
-      if (extract.length > 80 && /football|NFL|AFL|Super Bowl|Pro Bowl|All-Pro|quarterback|running back|linebacker|tackle|kicker|punter|receiver|corner|safety/i.test(extract)) {
+      const nick = player && (player.club || teamName(player.fromTeam || state.team) || "").split(" ").slice(-1)[0];
+      const mentionsClub = !player || !nick || extract.includes(nick) || extract.includes(teamName(player.fromTeam || state.team).split(" ").slice(-1)[0]);
+      if (mentionsClub && extract.length > 80 && /football|NFL|AFL|Super Bowl|Pro Bowl|All-Pro|quarterback|running back|linebacker|tackle|kicker|punter|receiver|corner|safety/i.test(extract)) {
         node.textContent = extract.split(/(?<=\.)\s+/).slice(0, 4).join(" ");
       }
     } catch (_) {
@@ -1228,7 +1243,7 @@ button, select { font: inherit; }
           ${logoHtml(player.fromTeam || state.team, "logo-lg")}
           <div>
             <div class="name">${escapeHtml(player.name)} ${jersey}</div>
-            <div class="meta">${escapeHtml(pos)} · ${escapeHtml(teamName(player.fromTeam || state.team))}</div>
+            <div class="meta">${escapeHtml(pos)}${player.pos && player.pos !== pos ? ` (${escapeHtml(player.pos)})` : ""} · ${escapeHtml(player.club || teamName(player.fromTeam || state.team))}</div>
           </div>
         </div>
         <div class="stats">${escapeHtml(player.stats || "")}</div>
@@ -1266,15 +1281,65 @@ button, select { font: inherit; }
         if (dy > 80) closePlayerSheet();
       }, { passive: true });
     }
-    fillWikiBio(el("sheetBio"), player.name);
+    fillWikiBio(el("sheetBio"), player.name, player);
+  }
+
+  function randBelow(n) {
+    // Uniform integer in [0, n). crypto.getRandomValues + rejection sampling when available.
+    const c = (typeof window !== "undefined" && window.crypto) || (typeof crypto !== "undefined" ? crypto : null);
+    if (c && c.getRandomValues && n > 0 && n <= 0x100000000) {
+      const buf = new Uint32Array(1);
+      const limit = Math.floor(0x100000000 / n) * n;
+      for (let i = 0; i < 64; i++) {
+        c.getRandomValues(buf);
+        if (buf[0] < limit) return buf[0] % n;
+      }
+    }
+    return Math.floor(Math.random() * n);
   }
 
   function randInt(a, b) {
-    return a + Math.floor(Math.random() * (b - a + 1));
+    return a + randBelow(b - a + 1);
   }
 
   function pickRandom(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+    return arr[randBelow(arr.length)];
+  }
+
+  /** Every (team, decade) the franchise actually played in (lineage + AFL years counted). */
+  function validCombos(pos) {
+    const out = [];
+    for (const t of D().teams || []) {
+      for (const d of D().decades || []) {
+        if (!teamExistsInDecade(t.code, d)) continue;
+        if (pos && !rosterKeyHasPlayers(t.code, d, pos)) continue;
+        out.push({ team: t.code, decade: d });
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Uniform spin over valid team-decade combos.
+   *  - nothing locked: uniform over all valid (team, decade) pairs
+   *  - team locked:    decade uniform over the decades that team existed
+   *  - decade locked:  team uniform over teams that existed in that decade
+   */
+  function rollTeamDecade(pos) {
+    if (state.lockTeam && state.lockDecade) return { team: state.team, decade: state.decade };
+    if (state.lockTeam) {
+      let pool = decadesForTeam(state.team).filter((d) => !pos || rosterKeyHasPlayers(state.team, d, pos));
+      if (!pool.length) pool = decadesForTeam(state.team);
+      return { team: state.team, decade: pool.length ? pickRandom(pool) : state.decade };
+    }
+    if (state.lockDecade) {
+      let pool = teamsForDecade(state.decade).filter((t) => !pos || rosterKeyHasPlayers(t.code, state.decade, pos));
+      if (!pool.length) pool = teamsForDecade(state.decade);
+      return { team: pool.length ? pickRandom(pool).code : state.team, decade: state.decade };
+    }
+    let pool = validCombos(pos);
+    if (!pool.length) pool = validCombos(null);
+    return pickRandom(pool);
   }
 
   function initSelects() {
@@ -1402,7 +1467,7 @@ button, select { font: inherit; }
         </div>
         <div class="name">${p.name} ${jerseyLabel(p, state.selectedSlot)}</div>
         <div class="stats">${p.stats || ""}</div>
-        <div class="meta">${p.season} · ${teamName(p.fromTeam || state.team)} · ${state.decade}</div>
+        <div class="meta">${p.season} · ${p.club || teamName(p.fromTeam || state.team)} · ${state.decade}</div>
         <div class="rating">${p.rating}</div>
         <div class="blurb">${p.blurb || ""}</div>
         <div class="card-cta">Tap for card</div>
@@ -1515,18 +1580,12 @@ button, select { font: inherit; }
     if (rosterFull() || !state.selectedSlot) return;
     if (state.lockDecade && state.lockTeam) return;
     if (state.slotHasReveal && !canAffordRespin()) return;
-    if (!state.lockDecade) {
-      state.decade = pickRandom(D().decades);
-      el("decadeSelect").value = state.decade;
-    }
-    if (!state.lockTeam) {
-      const pool = teamsForDecade(state.decade);
-      state.team = pickRandom(pool.length ? pool : D().teams).code;
-      el("teamSelect").value = state.team;
-      updateTeamLogo();
-    } else {
-      updateTeamLogo();
-    }
+    const roll = rollTeamDecade(state.selectedSlot);
+    state.decade = roll.decade;
+    state.team = roll.team;
+    el("decadeSelect").value = state.decade;
+    el("teamSelect").value = state.team;
+    updateTeamLogo();
     const toast = ensureValidTeamDecade({ pos: state.selectedSlot });
     if (toast) showToast(toast);
     revealChoices(true);
@@ -1670,7 +1729,8 @@ button, select { font: inherit; }
 
   // —— Season ——
   function opponentPower(week) {
-    const base = 1960 + week * 4;
+    // +20 keeps the average matchup unchanged after the OL re-rating (avg drafted roster power rose ~20).
+    const base = 1980 + week * 4;
     return base + randInt(-150, 170);
   }
 

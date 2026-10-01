@@ -1,0 +1,785 @@
+{
+ "coaches": {
+  "1960s": [
+   {
+    "name": "Vince Lombardi",
+    "season": "1967",
+    "rating": 99,
+    "blurb": "Packers dynasty",
+    "tier": "Legend"
+   },
+   {
+    "name": "Don Shula",
+    "season": "1968",
+    "rating": 94,
+    "blurb": "Colts juggernaut",
+    "tier": "Legend"
+   },
+   {
+    "name": "Weeb Ewbank",
+    "season": "1968",
+    "rating": 91,
+    "blurb": "Jets SB III",
+    "tier": "Legend"
+   },
+   {
+    "name": "Tom Landry",
+    "season": "1966",
+    "rating": 92,
+    "blurb": "Cowboys innovator",
+    "tier": "Legend"
+   },
+   {
+    "name": "George Halas",
+    "season": "1963",
+    "rating": 90,
+    "blurb": "Bears title",
+    "tier": "Legend"
+   }
+  ],
+  "1970s": [
+   {
+    "name": "Chuck Noll",
+    "season": "1978",
+    "rating": 98,
+    "blurb": "Steel Curtain",
+    "tier": "Legend"
+   },
+   {
+    "name": "Don Shula",
+    "season": "1972",
+    "rating": 97,
+    "blurb": "Perfect Dolphins",
+    "tier": "Legend"
+   },
+   {
+    "name": "Tom Landry",
+    "season": "1977",
+    "rating": 94,
+    "blurb": "SB XII",
+    "tier": "Legend"
+   },
+   {
+    "name": "John Madden",
+    "season": "1976",
+    "rating": 93,
+    "blurb": "Raiders SB XI",
+    "tier": "Legend"
+   },
+   {
+    "name": "Bud Grant",
+    "season": "1973",
+    "rating": 90,
+    "blurb": "Vikings",
+    "tier": "Legend"
+   }
+  ],
+  "1980s": [
+   {
+    "name": "Bill Walsh",
+    "season": "1984",
+    "rating": 98,
+    "blurb": "West Coast dynasty",
+    "tier": "Legend"
+   },
+   {
+    "name": "Joe Gibbs",
+    "season": "1982",
+    "rating": 96,
+    "blurb": "Hogs SB XVII",
+    "tier": "Legend"
+   },
+   {
+    "name": "Bill Parcells",
+    "season": "1986",
+    "rating": 95,
+    "blurb": "Giants SB XXI",
+    "tier": "Legend"
+   },
+   {
+    "name": "Mike Ditka",
+    "season": "1985",
+    "rating": 94,
+    "blurb": "Bears SB XX",
+    "tier": "Legend"
+   },
+   {
+    "name": "Chuck Noll",
+    "season": "1980",
+    "rating": 90,
+    "blurb": "Late Steelers",
+    "tier": "Legend"
+   }
+  ],
+  "1990s": [
+   {
+    "name": "Jimmy Johnson",
+    "season": "1992",
+    "rating": 97,
+    "blurb": "Cowboys dynasty",
+    "tier": "Legend"
+   },
+   {
+    "name": "Mike Holmgren",
+    "season": "1996",
+    "rating": 94,
+    "blurb": "Packers SB XXXI",
+    "tier": "Legend"
+   },
+   {
+    "name": "George Seifert",
+    "season": "1994",
+    "rating": 93,
+    "blurb": "49ers SB XXIX",
+    "tier": "Legend"
+   },
+   {
+    "name": "Bill Parcells",
+    "season": "1996",
+    "rating": 92,
+    "blurb": "Pats SB run",
+    "tier": "Legend"
+   },
+   {
+    "name": "Marv Levy",
+    "season": "1990",
+    "rating": 90,
+    "blurb": "Bills four-peat",
+    "tier": "Legend"
+   }
+  ],
+  "2000s": [
+   {
+    "name": "Bill Belichick",
+    "season": "2007",
+    "rating": 99,
+    "blurb": "Pats dynasty peak",
+    "tier": "Legend"
+   },
+   {
+    "name": "Tony Dungy",
+    "season": "2006",
+    "rating": 94,
+    "blurb": "Colts SB XLI",
+    "tier": "Legend"
+   },
+   {
+    "name": "Jon Gruden",
+    "season": "2002",
+    "rating": 92,
+    "blurb": "Bucs SB XXXVII",
+    "tier": "Legend"
+   },
+   {
+    "name": "Andy Reid",
+    "season": "2004",
+    "rating": 90,
+    "blurb": "Eagles perennial",
+    "tier": "Legend"
+   },
+   {
+    "name": "Mike Shanahan",
+    "season": "2000",
+    "rating": 88,
+    "blurb": "Broncos",
+    "tier": "Star"
+   }
+  ],
+  "2010s": [
+   {
+    "name": "Bill Belichick",
+    "season": "2016",
+    "rating": 98,
+    "blurb": "SB LI coach",
+    "tier": "Legend"
+   },
+   {
+    "name": "Andy Reid",
+    "season": "2019",
+    "rating": 96,
+    "blurb": "Chiefs SB LIV",
+    "tier": "Legend"
+   },
+   {
+    "name": "Pete Carroll",
+    "season": "2013",
+    "rating": 94,
+    "blurb": "LOB SB",
+    "tier": "Legend"
+   },
+   {
+    "name": "John Harbaugh",
+    "season": "2012",
+    "rating": 92,
+    "blurb": "Ravens SB XLVII",
+    "tier": "Legend"
+   },
+   {
+    "name": "Mike Tomlin",
+    "season": "2010",
+    "rating": 90,
+    "blurb": "Steelers steady",
+    "tier": "Legend"
+   }
+  ],
+  "2020s": [
+   {
+    "name": "Andy Reid",
+    "season": "2022",
+    "rating": 98,
+    "blurb": "Chiefs repeat",
+    "tier": "Legend"
+   },
+   {
+    "name": "Kyle Shanahan",
+    "season": "2023",
+    "rating": 94,
+    "blurb": "49ers juggernaut",
+    "tier": "Legend"
+   },
+   {
+    "name": "Sean McVay",
+    "season": "2021",
+    "rating": 93,
+    "blurb": "Rams SB LVI",
+    "tier": "Legend"
+   },
+   {
+    "name": "Nick Sirianni",
+    "season": "2022",
+    "rating": 90,
+    "blurb": "Eagles SB run",
+    "tier": "Legend"
+   },
+   {
+    "name": "Mike McDaniel",
+    "season": "2022",
+    "rating": 88,
+    "blurb": "Dolphins innovator",
+    "tier": "Star"
+   }
+  ]
+ },
+ "champHeroes": {
+  "1960s": [
+   {
+    "name": "Bart Starr",
+    "season": "1967",
+    "rating": 98,
+    "blurb": "Ice Bowl + SB II",
+    "tier": "Legend"
+   },
+   {
+    "name": "Joe Namath",
+    "season": "1968",
+    "rating": 97,
+    "blurb": "SB III delivered",
+    "tier": "Legend"
+   },
+   {
+    "name": "Johnny Unitas",
+    "season": "1964",
+    "rating": 94,
+    "blurb": "Colts title",
+    "tier": "Legend"
+   },
+   {
+    "name": "Len Dawson",
+    "season": "1969",
+    "rating": 93,
+    "blurb": "SB IV hero",
+    "tier": "Legend"
+   },
+   {
+    "name": "Paul Hornung",
+    "season": "1961",
+    "rating": 88,
+    "blurb": "Packers scoring hero",
+    "tier": "Star"
+   }
+  ],
+  "1970s": [
+   {
+    "name": "Franco Harris",
+    "season": "1972",
+    "rating": 96,
+    "blurb": "Immaculate Reception",
+    "tier": "Legend"
+   },
+   {
+    "name": "Roger Staubach",
+    "season": "1971",
+    "rating": 95,
+    "blurb": "SB VI comeback",
+    "tier": "Legend"
+   },
+   {
+    "name": "Larry Csonka",
+    "season": "1973",
+    "rating": 94,
+    "blurb": "Perfect-era hammer",
+    "tier": "Legend"
+   },
+   {
+    "name": "Lynn Swann",
+    "season": "1975",
+    "rating": 93,
+    "blurb": "SB X ballet",
+    "tier": "Legend"
+   },
+   {
+    "name": "Ken Stabler",
+    "season": "1976",
+    "rating": 92,
+    "blurb": "Sea of Hands",
+    "tier": "Legend"
+   }
+  ],
+  "1980s": [
+   {
+    "name": "Joe Montana",
+    "season": "1981",
+    "rating": 99,
+    "blurb": "The Catch drive",
+    "tier": "Legend"
+   },
+   {
+    "name": "Doug Williams",
+    "season": "1987",
+    "rating": 96,
+    "blurb": "SB XXII explosion",
+    "tier": "Legend"
+   },
+   {
+    "name": "Lawrence Taylor",
+    "season": "1986",
+    "rating": 97,
+    "blurb": "Playoff wrecker",
+    "tier": "Legend"
+   },
+   {
+    "name": "Marcus Allen",
+    "season": "1983",
+    "rating": 95,
+    "blurb": "SB XVIII dash",
+    "tier": "Legend"
+   },
+   {
+    "name": "Phil Simms",
+    "season": "1986",
+    "rating": 94,
+    "blurb": "SB XXI near-perfect",
+    "tier": "Legend"
+   }
+  ],
+  "1990s": [
+   {
+    "name": "John Elway",
+    "season": "1997",
+    "rating": 97,
+    "blurb": "SB XXXII finally",
+    "tier": "Legend"
+   },
+   {
+    "name": "Emmitt Smith",
+    "season": "1993",
+    "rating": 96,
+    "blurb": "Shoulder SB XXVIII",
+    "tier": "Legend"
+   },
+   {
+    "name": "Steve Young",
+    "season": "1994",
+    "rating": 95,
+    "blurb": "SB XXIX six TD",
+    "tier": "Legend"
+   },
+   {
+    "name": "Joe Montana",
+    "season": "1990",
+    "rating": 94,
+    "blurb": "Comeback vs CLE",
+    "tier": "Legend"
+   },
+   {
+    "name": "Terrell Davis",
+    "season": "1998",
+    "rating": 94,
+    "blurb": "Playoff wrecking",
+    "tier": "Legend"
+   }
+  ],
+  "2000s": [
+   {
+    "name": "Tom Brady",
+    "season": "2001",
+    "rating": 98,
+    "blurb": "Tuck Rule + SB XXXVI",
+    "tier": "Legend"
+   },
+   {
+    "name": "Eli Manning",
+    "season": "2007",
+    "rating": 97,
+    "blurb": "Helmet catch XLII",
+    "tier": "Legend"
+   },
+   {
+    "name": "Kurt Warner",
+    "season": "1999",
+    "rating": 96,
+    "blurb": "Greatest Show",
+    "tier": "Legend"
+   },
+   {
+    "name": "Peyton Manning",
+    "season": "2006",
+    "rating": 94,
+    "blurb": "SB XLI",
+    "tier": "Legend"
+   },
+   {
+    "name": "Ben Roethlisberger",
+    "season": "2005",
+    "rating": 92,
+    "blurb": "SB XL rookie",
+    "tier": "Legend"
+   }
+  ],
+  "2010s": [
+   {
+    "name": "Tom Brady",
+    "season": "2016",
+    "rating": 99,
+    "blurb": "SB LI 28-3",
+    "tier": "Legend"
+   },
+   {
+    "name": "Nick Foles",
+    "season": "2017",
+    "rating": 97,
+    "blurb": "Philly Special",
+    "tier": "Legend"
+   },
+   {
+    "name": "Patrick Mahomes",
+    "season": "2019",
+    "rating": 96,
+    "blurb": "SB LIV comeback",
+    "tier": "Legend"
+   },
+   {
+    "name": "Joe Flacco",
+    "season": "2012",
+    "rating": 94,
+    "blurb": "Elite Dragon",
+    "tier": "Legend"
+   },
+   {
+    "name": "Russell Wilson",
+    "season": "2013",
+    "rating": 93,
+    "blurb": "SB XLVIII",
+    "tier": "Legend"
+   }
+  ],
+  "2020s": [
+   {
+    "name": "Patrick Mahomes",
+    "season": "2022",
+    "rating": 98,
+    "blurb": "SB LVII duel",
+    "tier": "Legend"
+   },
+   {
+    "name": "Patrick Mahomes",
+    "season": "2023",
+    "rating": 97,
+    "blurb": "SB LVIII OT",
+    "tier": "Legend"
+   },
+   {
+    "name": "Tom Brady",
+    "season": "2020",
+    "rating": 96,
+    "blurb": "SB LV seventh",
+    "tier": "Legend"
+   },
+   {
+    "name": "Matthew Stafford",
+    "season": "2021",
+    "rating": 95,
+    "blurb": "SB LVI redemption",
+    "tier": "Legend"
+   },
+   {
+    "name": "Jalen Hurts",
+    "season": "2022",
+    "rating": 92,
+    "blurb": "SB LVII warrior",
+    "tier": "Legend"
+   }
+  ]
+ },
+ "sbMvps": {
+  "1960s": [
+   {
+    "name": "Bart Starr",
+    "season": "1967",
+    "rating": 98,
+    "blurb": "SB I & II MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Joe Namath",
+    "season": "1968",
+    "rating": 97,
+    "blurb": "SB III MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Len Dawson",
+    "season": "1969",
+    "rating": 94,
+    "blurb": "SB IV MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Jerry Kramer",
+    "season": "1967",
+    "rating": 90,
+    "blurb": "Ice Bowl block legend",
+    "tier": "Legend"
+   },
+   {
+    "name": "Max McGee",
+    "season": "1966",
+    "rating": 88,
+    "blurb": "SB I receiving hero",
+    "tier": "Star"
+   }
+  ],
+  "1970s": [
+   {
+    "name": "Terry Bradshaw",
+    "season": "1978",
+    "rating": 97,
+    "blurb": "SB XIII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Larry Csonka",
+    "season": "1973",
+    "rating": 96,
+    "blurb": "SB VIII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Roger Staubach",
+    "season": "1971",
+    "rating": 95,
+    "blurb": "SB VI MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Jake Scott",
+    "season": "1972",
+    "rating": 94,
+    "blurb": "SB VII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Chuck Howley",
+    "season": "1970",
+    "rating": 90,
+    "blurb": "SB V MVP",
+    "tier": "Legend"
+   }
+  ],
+  "1980s": [
+   {
+    "name": "Joe Montana",
+    "season": "1984",
+    "rating": 99,
+    "blurb": "SB XIX MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Joe Montana",
+    "season": "1981",
+    "rating": 98,
+    "blurb": "SB XVI MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Marcus Allen",
+    "season": "1983",
+    "rating": 97,
+    "blurb": "SB XVIII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Doug Williams",
+    "season": "1987",
+    "rating": 96,
+    "blurb": "SB XXII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Jim Plunkett",
+    "season": "1980",
+    "rating": 94,
+    "blurb": "SB XV MVP",
+    "tier": "Legend"
+   }
+  ],
+  "1990s": [
+   {
+    "name": "Steve Young",
+    "season": "1994",
+    "rating": 98,
+    "blurb": "SB XXIX MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Troy Aikman",
+    "season": "1992",
+    "rating": 96,
+    "blurb": "SB XXVII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Emmitt Smith",
+    "season": "1993",
+    "rating": 94,
+    "blurb": "SB XXVIII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Mark Rypien",
+    "season": "1991",
+    "rating": 93,
+    "blurb": "SB XXVI MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Ottis Anderson",
+    "season": "1990",
+    "rating": 92,
+    "blurb": "SB XXV MVP",
+    "tier": "Legend"
+   }
+  ],
+  "2000s": [
+   {
+    "name": "Tom Brady",
+    "season": "2001",
+    "rating": 98,
+    "blurb": "SB XXXVI MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Ray Lewis",
+    "season": "2000",
+    "rating": 97,
+    "blurb": "SB XXXV MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Kurt Warner",
+    "season": "1999",
+    "rating": 95,
+    "blurb": "SB XXXIV MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Deion Branch",
+    "season": "2004",
+    "rating": 94,
+    "blurb": "SB XXXIX MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Dexter Jackson",
+    "season": "2002",
+    "rating": 90,
+    "blurb": "SB XXXVII MVP",
+    "tier": "Legend"
+   }
+  ],
+  "2010s": [
+   {
+    "name": "Von Miller",
+    "season": "2015",
+    "rating": 97,
+    "blurb": "SB 50 MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Aaron Rodgers",
+    "season": "2010",
+    "rating": 95,
+    "blurb": "SB XLV MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Eli Manning",
+    "season": "2011",
+    "rating": 94,
+    "blurb": "SB XLVI MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Joe Flacco",
+    "season": "2012",
+    "rating": 93,
+    "blurb": "SB XLVII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Malcolm Smith",
+    "season": "2013",
+    "rating": 90,
+    "blurb": "SB XLVIII MVP",
+    "tier": "Legend"
+   }
+  ],
+  "2020s": [
+   {
+    "name": "Patrick Mahomes",
+    "season": "2022",
+    "rating": 99,
+    "blurb": "SB LVII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Patrick Mahomes",
+    "season": "2023",
+    "rating": 98,
+    "blurb": "SB LVIII MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Tom Brady",
+    "season": "2020",
+    "rating": 98,
+    "blurb": "SB LV MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Cooper Kupp",
+    "season": "2021",
+    "rating": 97,
+    "blurb": "SB LVI MVP",
+    "tier": "Legend"
+   },
+   {
+    "name": "Julian Edelman",
+    "season": "2018",
+    "rating": 92,
+    "blurb": "SB LIII MVP honor",
+    "tier": "Legend"
+   }
+  ]
+ }
+}

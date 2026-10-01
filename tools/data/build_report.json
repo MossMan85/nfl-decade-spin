@@ -1,0 +1,547 @@
+{
+ "shortfalls": [
+  [
+   "ATL|1960s|P",
+   [
+    "Billy Lothridge"
+   ]
+  ],
+  [
+   "BAL|1990s|K",
+   [
+    "Matt Stover"
+   ]
+  ],
+  [
+   "BAL|1990s|P",
+   [
+    "Greg Montgomery",
+    "Kyle Richardson"
+   ]
+  ],
+  [
+   "BAL|2010s|P",
+   [
+    "Sam Koch"
+   ]
+  ],
+  [
+   "BAL|2020s|K",
+   [
+    "Justin Tucker",
+    "Tyler Loop"
+   ]
+  ],
+  [
+   "CAR|1990s|K",
+   [
+    "John Kasay",
+    "Richie Cunningham"
+   ]
+  ],
+  [
+   "CIN|1960s|C",
+   [
+    "Bob Johnson",
+    "John Matlock"
+   ]
+  ],
+  [
+   "CLE|1970s|K",
+   [
+    "Don Cockroft",
+    "Chris Gartner"
+   ]
+  ],
+  [
+   "DET|2000s|K",
+   [
+    "Jason Hanson",
+    "Remy Hamilton"
+   ]
+  ],
+  [
+   "DET|2020s|P",
+   [
+    "Jack Fox"
+   ]
+  ],
+  [
+   "GB|2010s|K",
+   [
+    "Mason Crosby"
+   ]
+  ],
+  [
+   "HOU|2000s|K",
+   [
+    "Kris Brown"
+   ]
+  ],
+  [
+   "HOU|2000s|P",
+   [
+    "Chad Stanley",
+    "Matt Turk"
+   ]
+  ],
+  [
+   "IND|1970s|P",
+   [
+    "David Lee",
+    "Bucky Dilts"
+   ]
+  ],
+  [
+   "IND|2010s|K",
+   [
+    "Adam Vinatieri",
+    "Chase McLaughlin"
+   ]
+  ],
+  [
+   "JAX|1990s|K",
+   [
+    "Mike Hollis",
+    "Steve Lindsey"
+   ]
+  ],
+  [
+   "JAX|1990s|P",
+   [
+    "Bryan Barker"
+   ]
+  ],
+  [
+   "KC|1970s|K",
+   [
+    "Jan Stenerud",
+    "Bob Stein"
+   ]
+  ],
+  [
+   "KC|1980s|K",
+   [
+    "Nick Lowery",
+    "James Hamrick"
+   ]
+  ],
+  [
+   "KC|2010s|P",
+   [
+    "Dustin Colquitt",
+    "Ryan Succop"
+   ]
+  ],
+  [
+   "LV|1960s|C",
+   [
+    "Jim Otto"
+   ]
+  ],
+  [
+   "LV|2000s|P",
+   [
+    "Shane Lechler",
+    "Kevin Stemke"
+   ]
+  ],
+  [
+   "LV|2020s|K",
+   [
+    "Daniel Carlson"
+   ]
+  ],
+  [
+   "LV|2020s|P",
+   [
+    "A.J. Cole",
+    "Daniel Carlson"
+   ]
+  ],
+  [
+   "MIA|1960s|C",
+   [
+    "Tom Goode",
+    "Mike Hudock"
+   ]
+  ],
+  [
+   "MIA|2020s|K",
+   [
+    "Jason Sanders",
+    "Riley Patterson"
+   ]
+  ],
+  [
+   "MIN|1960s|C",
+   [
+    "Mick Tingelhoff",
+    "Bill Lapham"
+   ]
+  ],
+  [
+   "MIN|1970s|K",
+   [
+    "Fred Cox",
+    "Rick Danmeier"
+   ]
+  ],
+  [
+   "NO|1960s|K",
+   [
+    "Tom Dempsey",
+    "Charlie Durkee"
+   ]
+  ],
+  [
+   "NO|2010s|P",
+   [
+    "Thomas Morstead",
+    "Brandon Fields"
+   ]
+  ],
+  [
+   "NYJ|1980s|K",
+   [
+    "Pat Leahy",
+    "Pat Ragusa"
+   ]
+  ],
+  [
+   "PHI|2020s|K",
+   [
+    "Jake Elliott",
+    "Cameron Dicker"
+   ]
+  ],
+  [
+   "SEA|2010s|P",
+   [
+    "Jon Ryan",
+    "Michael Dickson"
+   ]
+  ],
+  [
+   "SEA|2020s|K",
+   [
+    "Jason Myers"
+   ]
+  ],
+  [
+   "SEA|2020s|P",
+   [
+    "Michael Dickson"
+   ]
+  ],
+  [
+   "TB|1970s|P",
+   [
+    "Dave Green",
+    "Tom Blanchard"
+   ]
+  ],
+  [
+   "TEN|2010s|P",
+   [
+    "Brett Kern",
+    "Ryan Santoso"
+   ]
+  ],
+  [
+   "WAS|1970s|P",
+   [
+    "Mike Bragg"
+   ]
+  ],
+  [
+   "WAS|2020s|P",
+   [
+    "Tress Way",
+    "Ryan Winslow"
+   ]
+  ]
+ ],
+ "widened": [
+  [
+   "TB|1970s|SS",
+   "Cedric Brown",
+   "FS"
+  ]
+ ],
+ "depth_filled": [
+  [
+   "ATL|1970s|TE",
+   "Greg McCrary"
+  ],
+  [
+   "ATL|1970s|TE",
+   "Mike Donohoe"
+  ],
+  [
+   "ATL|2010s|QB",
+   "Chris Redman"
+  ],
+  [
+   "BAL|2000s|K",
+   "Wade Richey"
+  ],
+  [
+   "BAL|2020s|P",
+   "Johnny Townsend"
+  ],
+  [
+   "BUF|1990s|K",
+   "Brad Daluiso"
+  ],
+  [
+   "BUF|1990s|P",
+   "John Nies"
+  ],
+  [
+   "BUF|2000s|P",
+   "Rian Lindell"
+  ],
+  [
+   "BUF|2020s|QB",
+   "Mitchell Trubisky"
+  ],
+  [
+   "BUF|2020s|QB",
+   "Matt Barkley"
+  ],
+  [
+   "CHI|1970s|P",
+   "Walter Payton"
+  ],
+  [
+   "CHI|2020s|K",
+   "Jake Moody"
+  ],
+  [
+   "CHI|2020s|K",
+   "Michael Badgley"
+  ],
+  [
+   "CIN|1960s|TE",
+   "Bruce Coslet"
+  ],
+  [
+   "CIN|1960s|K",
+   "Rod Sherman"
+  ],
+  [
+   "CIN|1960s|P",
+   "Fletcher Smith"
+  ],
+  [
+   "CIN|1990s|K",
+   "Lee Johnson"
+  ],
+  [
+   "CIN|2000s|K",
+   "Dave Rayner"
+  ],
+  [
+   "CIN|2010s|P",
+   "Mike Nugent"
+  ],
+  [
+   "CLE|1970s|K",
+   "Chris Gartner"
+  ],
+  [
+   "CLE|2000s|K",
+   "Billy Cundiff"
+  ],
+  [
+   "DAL|1970s|QB",
+   "Danny White"
+  ],
+  [
+   "DEN|1970s|K",
+   "Fred Steinfort"
+  ],
+  [
+   "DEN|1990s|K",
+   "Scott Bentley"
+  ],
+  [
+   "DEN|2020s|K",
+   "Taylor Russolino"
+  ],
+  [
+   "DET|2000s|K",
+   "Remy Hamilton"
+  ],
+  [
+   "GB|2000s|QB",
+   "Craig Nall"
+  ],
+  [
+   "IND|2000s|QB",
+   "Brock Huard"
+  ],
+  [
+   "IND|2000s|P",
+   "Mike Vanderjagt"
+  ],
+  [
+   "IND|2000s|P",
+   "Jason Baker"
+  ],
+  [
+   "IND|2010s|P",
+   "Pat McAfee"
+  ],
+  [
+   "IND|2010s|P",
+   "Jeremy Kapinos"
+  ],
+  [
+   "JAX|1990s|K",
+   "Steve Lindsey"
+  ],
+  [
+   "KC|1970s|K",
+   "Bob Stein"
+  ],
+  [
+   "KC|1980s|K",
+   "James Hamrick"
+  ],
+  [
+   "KC|2010s|P",
+   "Ryan Succop"
+  ],
+  [
+   "KC|2020s|QB",
+   "Chad Henne"
+  ],
+  [
+   "KC|2020s|K",
+   "Elliott Fry"
+  ],
+  [
+   "LAC|2000s|P",
+   "James Tuthill"
+  ],
+  [
+   "LAC|2010s|QB",
+   "Kellen Clemens"
+  ],
+  [
+   "LAC|2010s|QB",
+   "Tyrod Taylor"
+  ],
+  [
+   "LAC|2020s|P",
+   "Tristan Vizcaino"
+  ],
+  [
+   "LAR|1960s|TE",
+   "Duane Allen"
+  ],
+  [
+   "LAR|1960s|K",
+   "Les Richter"
+  ],
+  [
+   "LAR|2010s|P",
+   "Zach Hocker"
+  ],
+  [
+   "LV|1980s|K",
+   "David Hardy"
+  ],
+  [
+   "LV|1990s|P",
+   "Billy Joe Hobert"
+  ],
+  [
+   "LV|2000s|K",
+   "Shane Lechler"
+  ],
+  [
+   "LV|2000s|P",
+   "Kevin Stemke"
+  ],
+  [
+   "LV|2020s|P",
+   "Daniel Carlson"
+  ],
+  [
+   "MIA|1970s|K",
+   "Karl Kremser"
+  ],
+  [
+   "NE|1960s|K",
+   "Justin Canale"
+  ],
+  [
+   "NE|1960s|K",
+   "Jim Crawford"
+  ],
+  [
+   "NE|2000s|K",
+   "Doug Flutie"
+  ],
+  [
+   "NO|2010s|P",
+   "Brandon Fields"
+  ],
+  [
+   "NYG|2010s|QB",
+   "Ryan Nassib"
+  ],
+  [
+   "PHI|2000s|K",
+   "Jose Cortez"
+  ],
+  [
+   "PHI|2000s|K",
+   "Mark Simoneau"
+  ],
+  [
+   "PHI|2020s|K",
+   "Cameron Dicker"
+  ],
+  [
+   "PIT|1970s|P",
+   "Terry Bradshaw"
+  ],
+  [
+   "PIT|2020s|K",
+   "Nick Sciba"
+  ],
+  [
+   "SEA|1970s|QB",
+   "Bill Munson"
+  ],
+  [
+   "SEA|1970s|P",
+   "Efren Herrera"
+  ],
+  [
+   "TB|1970s|C",
+   "John Ward"
+  ],
+  [
+   "TB|2020s|QB",
+   "Blaine Gabbert"
+  ],
+  [
+   "TB|2020s|K",
+   "Bradley Pinion"
+  ],
+  [
+   "TEN|2000s|P",
+   "Josh Miller"
+  ],
+  [
+   "TEN|2010s|P",
+   "Ryan Santoso"
+  ]
+ ],
+ "curated_validated": 1604
+}
